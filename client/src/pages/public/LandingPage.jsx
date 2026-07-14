@@ -252,7 +252,6 @@ const LandingPage = () => {
     const requestRef = useRef();
     const mouse = useRef({ x: -999, y: -999 });
     const smooth = useRef({ x: -999, y: -999 });
-    const [cursorPos, setCursorPos] = useState({ x: -999, y: -999 });
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -269,7 +268,10 @@ const LandingPage = () => {
                 if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
                     smooth.current.x += dx * 0.1;
                     smooth.current.y += dy * 0.1;
-                    setCursorPos({ x: smooth.current.x, y: smooth.current.y });
+                    if (containerRef.current) {
+                        containerRef.current.style.setProperty('--cursor-x', `${smooth.current.x}px`);
+                        containerRef.current.style.setProperty('--cursor-y', `${smooth.current.y}px`);
+                    }
                 }
             }
             requestRef.current = requestAnimationFrame(animate);
@@ -323,7 +325,7 @@ const LandingPage = () => {
                 <div className="absolute inset-0 bg-center bg-cover bg-no-repeat z-10 hero-zoom" style={{ backgroundImage: `url(${BG_IMAGE_1})` }} />
 
                 {/* Layer 2: Reveal layer */}
-                <RevealLayer image={BG_IMAGE_2} cursorX={cursorPos.x} cursorY={cursorPos.y} />
+                <RevealLayer image={BG_IMAGE_2} />
 
                 {/* Layer 3: Heading */}
                 <div className="absolute top-[20%] left-0 right-0 flex flex-col items-center text-center px-5 pointer-events-none z-50">

@@ -3,7 +3,9 @@ const Book = require('./server/models/Book');
 const Reservation = require('./server/models/Reservation');
 const User = require('./server/models/User');
 
-const MONGODB_URI = "mongodb://adminnik:23l5WYIQIXSq3TEh@ac-gyhcr3z-shard-00-00.fk6oule.mongodb.net:27017,ac-gyhcr3z-shard-00-01.fk6oule.mongodb.net:27017,ac-gyhcr3z-shard-00-02.fk6oule.mongodb.net:27017/librasync?ssl=true&authSource=admin&replicaSet=atlas-sjphuz-shard-0&retryWrites=true&w=majority&appName=Cluster0";
+require('dotenv').config({ path: './server/.env' });
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function main() {
     try {

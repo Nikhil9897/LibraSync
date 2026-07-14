@@ -82,8 +82,13 @@ const LoginView = ({ onSwitch }) => {
 
                 <div className="flex items-center justify-between pt-1">
                     <label className="flex items-center gap-2 cursor-pointer group">
-                        <div className="w-4 h-4 rounded border-2 border-gray-300 group-hover:border-[#0d5959] flex items-center justify-center transition-colors">
-                            <input type="checkbox" className="opacity-0 absolute" />
+                        <div className="relative flex items-center justify-center w-4 h-4">
+                            <input type="checkbox" className="peer absolute opacity-0 w-full h-full cursor-pointer z-10" />
+                            <div className="absolute w-4 h-4 rounded border-2 border-gray-300 dark:border-slate-600 group-hover:border-[#0d5959] peer-checked:bg-[#0d5959] peer-checked:border-[#0d5959] flex items-center justify-center transition-all">
+                                <svg className="w-2.5 h-2.5 text-white scale-0 peer-checked:scale-100 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
                         </div>
                         <span className="text-sm text-slate-700 dark:text-slate-200 font-medium select-none">Remember me</span>
                     </label>

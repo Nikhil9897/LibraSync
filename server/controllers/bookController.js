@@ -5,6 +5,7 @@ const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
 const { parsePagination } = require('../utils/paginate');
 const User = require('../models/User');
+const { uploadBase64Image } = require('../utils/cloudinary');
 
 // GET /api/v1/books — List, search, filter, paginate
 exports.getAllBooks = asyncHandler(async (req, res) => {
@@ -98,13 +99,29 @@ exports.toggleWishlist = asyncHandler(async (req, res) => {
 
 // POST /api/v1/books — [admin/librarian]
 exports.createBook = asyncHandler(async (req, res) => {
-    const book = await Book.create(req.body);
+    let bookData = { ...req.body };
+    if (bookData.coverImage && typeof bookData.coverImage === 'string' && bookData.coverImage.startsWith('data:image/')) {
+        try {
+            bookData.coverImage = await uploadBase64Image(bookData.coverImage, 'librasync/books');
+        } catch (err) {
+            throw new ApiError(400, 'Cover image upload failed');
+        }
+    }
+    const book = await Book.create(bookData);
     res.status(201).json(new ApiResponse(201, 'Book created', { book }));
 });
 
 // PUT /api/v1/books/:id — [admin/librarian]
 exports.updateBook = asyncHandler(async (req, res) => {
-    const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
+    let bookData = { ...req.body };
+    if (bookData.coverImage && typeof bookData.coverImage === 'string' && bookData.coverImage.startsWith('data:image/')) {
+        try {
+            bookData.coverImage = await uploadBase64Image(bookData.coverImage, 'librasync/books');
+        } catch (err) {
+            throw new ApiError(400, 'Cover image upload failed');
+        }
+    }
+    const book = await Book.findByIdAndUpdate(req.params.id, bookData, {
         new: true, runValidators: true,
     });
     if (!book) throw new ApiError(404, 'Book not found');

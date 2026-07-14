@@ -3,6 +3,7 @@ const asyncHandler = require('../middleware/asyncHandler');
 const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
 const { clearUserCache } = require('../middleware/auth');
+const { uploadBase64Image } = require('../utils/cloudinary');
 
 // @desc    Update user profile
 // @route   PUT /api/v1/users/me
@@ -16,7 +17,19 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     if (name) user.name = name;
     if (phone !== undefined) user.phone = phone;
     if (address !== undefined) user.address = address;
-    if (avatar !== undefined) user.avatar = avatar;
+    
+    if (avatar !== undefined) {
+        if (typeof avatar === 'string' && avatar.startsWith('data:image/')) {
+            try {
+                const url = await uploadBase64Image(avatar, 'librasync/avatars');
+                user.avatar = url;
+            } catch (err) {
+                throw new ApiError(400, 'Image upload failed. Please try again.');
+            }
+        } else {
+            user.avatar = avatar; // allow empty string to clear avatar
+        }
+    }
 
     await user.save();
     clearUserCache(user._id); // Invalidate cache after profile update
@@ -30,7 +43,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/users/wishlist
 // @access  Private
 exports.getWishlist = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id).populate('wishlist');
+    const user = await User.findById(req.user.id).populate('wishlist').lean();
     if (!user) throw new ApiError(404, 'User not found');
     // Deduplicate in case of legacy duplicate entries
     const seen = new Set();

@@ -89,6 +89,39 @@ exports.googleCallback = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/auth/me
 exports.getMe = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
+    
+    // --- Streak Logic ---
+    let needsSave = false;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    if (user.lastLoginDate) {
+        const lastLoginStr = user.lastLoginDate.toISOString().split('T')[0];
+        
+        if (todayStr !== lastLoginStr) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            if (lastLoginStr === yesterdayStr) {
+                user.currentStreak += 1; // Kept the streak alive
+            } else {
+                user.currentStreak = 1; // Streak broken
+            }
+            user.lastLoginDate = now;
+            needsSave = true;
+        }
+    } else {
+        // First login since streak feature was added
+        user.currentStreak = 1;
+        user.lastLoginDate = now;
+        needsSave = true;
+    }
+    
+    if (needsSave) {
+        await user.save({ validateBeforeSave: false });
+    }
+    
     res.json(new ApiResponse(200, 'User profile', { user }));
 });
 

@@ -75,9 +75,16 @@ const AdminDashboard = () => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-slate-800 border dark:border-slate-700 border-slate-700 p-3 rounded-lg shadow-xl">
-                    <p className="text-slate-700 dark:text-slate-200 text-xs mb-1">{new Date(label).toLocaleDateString()}</p>
-                    <p className="text-[#10B981] font-bold">Borrows: {payload[0].value}</p>
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-3.5 rounded-xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10">
+                    <p className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1.5">
+                        {new Date(label).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-teal-500 dark:bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.6)]"></div>
+                        <p className="text-slate-800 dark:text-white font-bold text-lg leading-none">
+                            {payload[0].value} <span className="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">Borrows</span>
+                        </p>
+                    </div>
                 </div>
             );
         }
@@ -173,14 +180,18 @@ const AdminDashboard = () => {
                     <div className="flex-1 min-h-[300px]">
                         {trends.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <AreaChart data={trends} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorBorrows" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                                            <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                                            <stop offset="5%" stopColor="#2dd4bf" stopOpacity={0.4}/>
+                                            <stop offset="95%" stopColor="#2dd4bf" stopOpacity={0}/>
                                         </linearGradient>
+                                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="4" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.2} />
+                                    <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#94a3b8" opacity={0.15} />
                                     <XAxis 
                                         dataKey="date" 
                                         tickFormatter={(tick) => {
@@ -189,23 +200,28 @@ const AdminDashboard = () => {
                                         }}
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#6B7280', fontSize: 11 }}
-                                        dy={10}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                                        dy={15}
                                     />
                                     <YAxis 
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#6B7280', fontSize: 11 }}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                                        dx={-10}
                                     />
-                                    <RechartsTooltip content={<CustomTooltip />} />
+                                    <RechartsTooltip 
+                                        content={<CustomTooltip />} 
+                                        cursor={{ stroke: '#2dd4bf', strokeWidth: 1, strokeDasharray: '4 4', opacity: 0.4 }}
+                                    />
                                     <Area 
                                         type="monotone" 
                                         dataKey="borrows" 
-                                        stroke="#10B981" 
-                                        strokeWidth={3}
+                                        stroke="#2dd4bf" 
+                                        strokeWidth={4}
                                         fillOpacity={1} 
                                         fill="url(#colorBorrows)" 
-                                        activeDot={{ r: 6, fill: '#10B981', stroke: '#fff', strokeWidth: 2 }}
+                                        activeDot={{ r: 6, fill: '#2dd4bf', stroke: '#1e293b', strokeWidth: 3, shadow: '0px 0px 10px rgba(45,212,191,0.8)' }}
+                                        style={{ filter: 'url(#glow)' }}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>

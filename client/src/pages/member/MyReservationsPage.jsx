@@ -122,7 +122,7 @@ const MyReservationsPage = () => {
                                     
                                     {res.status === 'pending' && (
                                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50 inline-block px-4 py-2 rounded-lg border dark:border-slate-700 border-slate-100 dark:border-slate-600">
-                                            Estimated Wait: <span className="font-bold text-[#1a1f36] dark:text-white">~{(res.position || 1) * 14} Days</span>
+                                            Estimated Wait: <span className="font-bold text-[#1a1f36] dark:text-white">~{res.estimatedWaitDays !== undefined ? res.estimatedWaitDays : (res.position || 1) * 14} Days</span>
                                         </p>
                                     )}
                                 </div>

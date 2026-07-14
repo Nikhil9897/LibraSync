@@ -108,8 +108,15 @@ const MemberDashboard = () => {
         { title: 'AI Picks', desc: 'Smart recommendations', icon: <Star className="text-rose-500 dark:text-rose-400" size={28} />, onClick: () => window.dispatchEvent(new CustomEvent('open-ai-chat', { detail: { action: 'ai-picks' } })), border: 'border-slate-700 group-hover:border-rose-300 dark:group-hover:border-rose-500/50' }
     ];
 
-    const readingGoal = { current: 14, target: 20 };
-    const goalPercentage = Math.round((readingGoal.current / readingGoal.target) * 100);
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const booksBorrowedThisMonth = borrows.filter(b => {
+        const borrowDate = new Date(b.borrowDate);
+        return borrowDate.getMonth() === currentMonth && borrowDate.getFullYear() === currentYear;
+    }).length;
+    
+    const readingGoal = { current: booksBorrowedThisMonth, target: user?.monthlyReadingGoal || 5 };
+    const goalPercentage = Math.min(100, Math.round((readingGoal.current / readingGoal.target) * 100) || 0);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -166,25 +173,28 @@ const MemberDashboard = () => {
                         </div>
                     </div>
                     
-                    <div className="flex flex-wrap gap-4 lg:gap-6 bg-black/20 p-5 rounded-2xl border dark:border-slate-700 border-white/10 backdrop-blur-sm">
-                        <div className="flex flex-col">
+                    <div className="flex flex-wrap items-center gap-4 lg:gap-6 bg-black/20 p-5 rounded-2xl border dark:border-slate-700 border-white/10 backdrop-blur-sm">
+                        <div className="flex flex-col justify-center h-full">
                             <span className="text-white/60 text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><Flame size={14} className="text-orange-400" /> Streak</span>
-                            <span className="text-xl font-bold ">15 Days</span>
+                            <span className="text-xl font-bold leading-none">{user?.currentStreak || 0} Day{user?.currentStreak !== 1 ? 's' : ''}</span>
                         </div>
-                        <div className="w-px bg-white/10 dark:bg-slate-800/10 hidden sm:block"></div>
-                        <div className="flex flex-col">
+                        <div className="w-px h-10 bg-white/10 dark:bg-slate-800/10 hidden sm:block"></div>
+                        <div className="flex flex-col justify-center h-full">
                             <span className="text-white/60 text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><Target size={14} className="text-purple-400" /> Goal</span>
-                            <div className="flex items-center gap-2">
-                                <div className="w-24 h-2 bg-white dark:bg-slate-800/20 rounded-full overflow-hidden">
-                                    <motion.div initial={{ width: 0 }} animate={{ width: `${goalPercentage}%` }} transition={{ duration: 1, delay: 0.5 }} className="h-full bg-gradient-to-r from-purple-400 to-[#D4AF37]"></motion.div>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <div className="w-24 h-2 bg-white dark:bg-slate-800/20 rounded-full overflow-hidden">
+                                        <motion.div initial={{ width: 0 }} animate={{ width: `${goalPercentage}%` }} transition={{ duration: 1, delay: 0.5 }} className="h-full bg-gradient-to-r from-purple-400 to-[#D4AF37]"></motion.div>
+                                    </div>
+                                    <span className="text-sm font-bold leading-none">{goalPercentage}%</span>
                                 </div>
-                                <span className="text-sm font-bold">{goalPercentage}%</span>
+                                <span className="text-white/60 text-[10px] font-medium leading-none">{readingGoal.current} of {readingGoal.target} books · Monthly</span>
                             </div>
                         </div>
-                        <div className="w-px bg-white/10 dark:bg-slate-800/10 hidden sm:block"></div>
-                        <div className="flex flex-col">
+                        <div className="w-px h-10 bg-white/10 dark:bg-slate-800/10 hidden sm:block"></div>
+                        <div className="flex flex-col justify-center h-full">
                             <span className="text-white/60 text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><BookOpen size={14} className="text-blue-400" /> Active</span>
-                            <span className="text-xl font-bold ">{activeBorrows.length} Books</span>
+                            <span className="text-xl font-bold leading-none">{activeBorrows.length} Books</span>
                         </div>
                     </div>
                 </div>
@@ -197,13 +207,13 @@ const MemberDashboard = () => {
                     {quickActions.map((action, idx) => {
                         const CardContent = () => (
                             <>
-                                <div className="absolute inset-0 bg-white dark:bg-slate-800 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="absolute inset-0 bg-slate-50 dark:bg-slate-700/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <div className="relative z-10 flex flex-col h-full">
                                     <div className={`mb-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ${idx === 0 ? 'w-16 h-16' : 'w-14 h-14'}`}>
                                         {action.icon}
                                     </div>
-                                    <h3 className={`font-bold text-[#1a1f36] dark:text-white dark:text-slate-100 mb-1 ${idx === 0 ? 'text-lg' : 'text-base'}`}>{action.title}</h3>
-                                    <p className={`text-slate-500 dark:text-slate-400 font-medium leading-relaxed ${idx === 0 ? 'text-sm' : 'text-xs'}`}>{action.desc}</p>
+                                    <h3 className={`font-bold text-[#1a1f36] dark:text-white mb-1 ${idx === 0 ? 'text-lg' : 'text-base'}`}>{action.title}</h3>
+                                    <p className={`text-slate-600 dark:text-slate-300 font-medium leading-relaxed ${idx === 0 ? 'text-sm' : 'text-xs'}`}>{action.desc}</p>
                                     <div className="mt-auto pt-4 flex justify-end">
                                         <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white text-slate-500 dark:text-slate-400 transition-colors shadow-sm">
                                             <ArrowRight size={16} />
@@ -232,14 +242,11 @@ const MemberDashboard = () => {
                 {/* Stats Cards (Span 5) */}
                 <div className="lg:col-span-5 grid grid-cols-3 gap-4">
                     {[
-                        { title: 'Active Borrows', count: activeBorrows.length, icon: <BookOpen className="text-blue-600 dark:text-blue-400" />, bg: 'bg-slate-50 dark:bg-slate-900', border: 'border-slate-700' },
-                        { title: 'Books Read', count: returnedBorrows.length, icon: <CheckCircle className="text-emerald-600 dark:text-emerald-400" />, trend: '+18%', bg: 'bg-slate-50 dark:bg-slate-900', border: 'border-slate-700' },
-                        { title: 'Total Borrows', count: borrows.length, icon: <Activity className="text-purple-600 dark:text-purple-400" />, bg: 'bg-slate-50 dark:bg-slate-900', border: 'border-slate-700' }
+                        { title: 'Active Borrows', count: activeBorrows.length, icon: <BookOpen className="text-blue-600 dark:text-blue-400" />, bg: 'bg-white dark:bg-slate-800', border: 'border-slate-700' },
+                        { title: 'Books Read', count: returnedBorrows.length, icon: <CheckCircle className="text-emerald-600 dark:text-emerald-400" />, trend: '+18%', bg: 'bg-white dark:bg-slate-800', border: 'border-slate-700' },
+                        { title: 'Total Borrows', count: borrows.length, icon: <Activity className="text-purple-600 dark:text-purple-400" />, bg: 'bg-white dark:bg-slate-800', border: 'border-slate-700' }
                     ].map((stat, idx) => (
-                        <motion.div key={idx} variants={itemVariants} className={`bg-slate-50 dark:bg-slate-900 p-5 rounded-[24px] border dark:border-slate-700 ${stat.border} shadow-[0_1px_2px_rgba(0,0,0,0.18),0_8px_24px_rgba(0,0,0,0.22)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden`}>
-                            <div className="absolute right-[-10px] top-[-10px] opacity-10 group-hover:scale-110 transition-transform">
-                                {stat.icon}
-                            </div>
+                        <motion.div key={idx} variants={itemVariants} className={`bg-slate-100/50 dark:bg-slate-800/80 p-5 rounded-[24px] border dark:border-slate-700 ${stat.border} shadow-[0_1px_2px_rgba(0,0,0,0.18),0_8px_24px_rgba(0,0,0,0.22)] flex flex-col justify-between overflow-hidden`}>
                             <div className="flex justify-between items-start mb-2 relative z-10">
                                 <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center shadow-sm`}>
                                     {stat.icon}
@@ -418,7 +425,7 @@ const MemberDashboard = () => {
                                 Due This Week
                             </h2>
                         </div>
-                        <div className="bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/30 rounded-2xl p-5 border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 flex items-center justify-center">
+                        <div className={`bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/30 rounded-2xl p-5 border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 flex items-center justify-center ${activeBorrows.filter(b => daysUntil(b.dueDate) <= 7 && daysUntil(b.dueDate) >= 0).length === 0 ? 'py-8' : ''}`}>
                             {activeBorrows.filter(b => daysUntil(b.dueDate) <= 7 && daysUntil(b.dueDate) >= 0).length > 0 ? (
                                 <div className="space-y-4 w-full">
                                     {activeBorrows.filter(b => daysUntil(b.dueDate) <= 7 && daysUntil(b.dueDate) >= 0).map(borrow => (
@@ -432,7 +439,12 @@ const MemberDashboard = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 py-4">No books due this week! 🎉</p>
+                                <div className="flex flex-col items-center text-center">
+                                    <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3">
+                                        <CheckCircle size={24} />
+                                    </div>
+                                    <p className="text-sm font-bold text-slate-500 dark:text-slate-400">No books due this week! 🎉</p>
+                                </div>
                             )}
                         </div>
                     </motion.div>

@@ -228,17 +228,17 @@ const DashboardLayout = () => {
                                     title={collapsed && !isMobile ? item.label : undefined}
                                     className={`relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 group overflow-hidden ${
                                         isActive
-                                            ? 'bg-white dark:bg-slate-800 text-[#0d5959] dark:text-[#0d5959] shadow-lg shadow-black/5'
+                                            ? 'bg-white dark:bg-slate-800 text-[#0d5959] dark:text-teal-400 shadow-lg shadow-black/5'
                                             : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:bg-slate-800 hover:text-[#1a1f36] dark:text-white'
                                     }`}
                                 >
                                     {isActive && (
                                         <motion.div 
                                             layoutId="activeIndicator"
-                                            className="absolute left-0 top-1/4 bottom-1/4 w-1.5 bg-blue-500 rounded-r-full shadow-[0_0_12px_#D4AF37]" 
+                                            className="absolute left-0 top-1/4 bottom-1/4 w-1.5 bg-[#0d5959] dark:bg-teal-400 rounded-r-full shadow-[0_0_12px_rgba(13,89,89,0.5)] dark:shadow-[0_0_12px_rgba(45,212,191,0.5)]" 
                                         />
                                     )}
-                                    <span className={`${isActive ? 'text-[#0d5959] dark:text-[#0d5959]' : 'text-slate-500 group-hover:text-[#1a1f36] dark:text-white'} transition-colors shrink-0`}>
+                                    <span className={`${isActive ? 'text-[#0d5959] dark:text-teal-400' : 'text-slate-500 group-hover:text-[#1a1f36] dark:text-white'} transition-colors shrink-0`}>
                                         {item.icon}
                                     </span>
                                     {(!collapsed || isMobile) && (

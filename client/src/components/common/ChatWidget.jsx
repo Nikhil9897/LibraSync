@@ -186,27 +186,36 @@ const ChatWidget = () => {
             </AnimatePresence>
 
             {/* Toggle Button */}
-            <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-600 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30 transition-all duration-300 relative z-[1000] ${isOpen ? 'rotate-90 rounded-full' : ''}`}
-            >
-                {isOpen ? (
-                    <FiX size={28} className="transition-transform" />
-                ) : (
-                    <motion.div
-                        animate={{ 
-                            y: [0, -6, 0],
-                            x: [0, -4, 4, 0],
-                            rotateZ: [0, -4, 4, 0]
-                        }}
-                        transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                    >
-                        <FaBook size={28} className="drop-shadow-md" />
-                    </motion.div>
+            <div className="relative group">
+                {/* Tooltip */}
+                {!isOpen && (
+                    <div className="absolute right-full top-1/2 -translate-y-1/2 mr-4 px-3 py-1.5 bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
+                        Chat with Libra AI
+                        <div className="absolute top-1/2 -right-1 -translate-y-1/2 border-4 border-transparent border-l-slate-800 dark:border-l-slate-700"></div>
+                    </div>
                 )}
-            </motion.button>
+                <motion.button
+                    onClick={() => setIsOpen(!isOpen)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-600 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30 transition-all duration-300 relative z-[1000] ${isOpen ? 'rotate-90 rounded-full' : ''}`}
+                >
+                    {isOpen ? (
+                        <FiX size={28} className="transition-transform" />
+                    ) : (
+                        <motion.div
+                            animate={{ 
+                                y: [0, -6, 0],
+                                x: [0, -4, 4, 0],
+                                rotateZ: [0, -4, 4, 0]
+                            }}
+                            transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                        >
+                            <FaBook size={28} className="drop-shadow-md" />
+                        </motion.div>
+                    )}
+                </motion.button>
+            </div>
         </div>
     );
 };

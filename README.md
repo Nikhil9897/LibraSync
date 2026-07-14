@@ -20,12 +20,13 @@ Welcome to **Librasync** – a modern, full-stack Library Management System buil
 ## ✨ Features
 
 - **🛡️ Secure Authentication**: JWT and Google OAuth integration using Passport.js for robust, seamless user login.
-- **📊 Interactive Dashboards**: Beautiful, data-driven visualization using Recharts for tracking library analytics.
+- **📈 Real-Time Gamification**: Dynamic reading streaks and personalized monthly reading goals that automatically update based on user activity.
+- **📊 Interactive Dashboards**: Beautiful, data-driven visualizations with glowing area charts, glassmorphic tooltips, and Recharts for tracking library analytics.
 - **🤖 AI-Powered Intelligence**: Integration with Cohere AI to provide smart insights and intelligent functionality.
 - **📅 Automated Reservations**: Smart book reservation management with automated, scheduled background checks via `node-cron`.
 - **☁️ Cloud Assets**: Seamless image and media handling with Cloudinary integration.
 - **✉️ Automated Communications**: Real-time notifications and alerts handled by Nodemailer.
-- **💫 Stunning UI/UX**: A highly responsive, animated, and visually engaging user interface built with Tailwind CSS and Framer Motion.
+- **💫 Stunning UI/UX**: A highly responsive, premium user interface featuring full Dark Mode support, Tailwind CSS v4, and Framer Motion micro-animations.
 - **🔖 Member Features**: Personalized wishlists, interactive dashboards, and easy QR code integrations.
 
 ## 🛠️ Tech Stack

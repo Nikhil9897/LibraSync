@@ -55,9 +55,40 @@ exports.createReservation = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/reservations/my
 // @access  Private
 exports.getMyReservations = asyncHandler(async (req, res) => {
-    const reservations = await Reservation.find({ user: req.user.id })
-        .populate('book', 'title author coverImage')
-        .sort('-createdAt');
+    const reservations = await Reservation.find({ 
+        user: req.user.id,
+        status: { $ne: 'cancelled' }
+    })
+        .populate('book', 'title author coverImage totalCopies')
+        .sort('-createdAt')
+        .lean();
+
+    const borrowDays = parseInt(process.env.BORROW_DAYS) || 14;
+
+    for (let r of reservations) {
+        if (r.status === 'pending') {
+            const activeBorrows = await Borrow.find({ book: r.book._id, status: 'active' })
+                .sort('dueDate')
+                .select('dueDate')
+                .lean();
+            
+            const C = activeBorrows.length > 0 ? activeBorrows.length : (r.book.totalCopies || 1);
+            const P = r.position || 1;
+
+            if (activeBorrows.length > 0) {
+                const borrowIndex = (P - 1) % C;
+                const wave = Math.floor((P - 1) / C);
+                
+                const baseDate = new Date(activeBorrows[borrowIndex].dueDate);
+                const estimatedDate = new Date(baseDate.getTime() + wave * borrowDays * 86400000);
+                
+                let days = Math.ceil((estimatedDate - new Date()) / 86400000);
+                r.estimatedWaitDays = days > 0 ? days : 1; // At least 1 day if overdue
+            } else {
+                r.estimatedWaitDays = P * borrowDays;
+            }
+        }
+    }
 
     res.json(new ApiResponse(200, 'Reservations retrieved', { reservations }));
 });

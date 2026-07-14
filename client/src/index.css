@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-premium-bg: #0B1120;
+  --color-premium-sidebar: #111827;
+  --color-premium-card: #1E293B;
+  --color-premium-border: #334155;
+  --color-premium-primary: #F8FAFC;
+  --color-premium-secondary: #94A3B8;
+  --color-premium-accent: #3B82F6;
+  --color-premium-success: #10B981;
+  --color-premium-warning: #F59E0B;
+  --color-premium-ai: #8B5CF6;
+  --color-premium-danger: #EF4444;
+}
+
+/* Custom base styles removed to allow light/dark mode */
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-50;
+  }
+}
+
+* { font-family: 'Inter', sans-serif; }
+
+/* Hide scrollbars globally while keeping scroll functionality */
+::-webkit-scrollbar { display: none; }
+* { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes heroReveal { 0%{opacity:0;transform:translateY(28px);filter:blur(12px)} 100%{opacity:1;transform:translateY(0);filter:blur(0)} }
+@keyframes heroFadeUp { 0%{opacity:0;transform:translateY(20px)} 100%{opacity:1;transform:translateY(0)} }
+@keyframes heroZoom { 0%{transform:scale(1.12)} 100%{transform:scale(1)} }
+.hero-anim { opacity:0; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
+.hero-reveal { animation-name:heroReveal; animation-duration:1.1s; }
+.hero-fade { animation-name:heroFadeUp; animation-duration:1s; }
+.hero-zoom { animation:heroZoom 1.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+@media (prefers-reduced-motion: reduce){ .hero-anim,.hero-zoom{ animation:none; opacity:1; } }
+
+@keyframes heartbeat-line {
+  0% { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+.animate-heartbeat {
+  stroke-dasharray: 200;
+  animation: heartbeat-line 2s linear infinite;
+}

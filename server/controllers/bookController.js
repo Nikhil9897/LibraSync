@@ -1,5 +1,5 @@
 const Book = require('../models/Book');
-require('../models/Category');
+const Category = require('../models/Category');
 const asyncHandler = require('../middleware/asyncHandler');
 const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
@@ -100,6 +100,9 @@ exports.toggleWishlist = asyncHandler(async (req, res) => {
 // POST /api/v1/books — [admin/librarian]
 exports.createBook = asyncHandler(async (req, res) => {
     let bookData = { ...req.body };
+    if (bookData.category && typeof bookData.category === 'object') {
+        bookData.category = bookData.category._id || bookData.category.id;
+    }
     if (bookData.coverImage && typeof bookData.coverImage === 'string' && bookData.coverImage.startsWith('data:image/')) {
         try {
             bookData.coverImage = await uploadBase64Image(bookData.coverImage, 'librasync/books');
@@ -114,6 +117,9 @@ exports.createBook = asyncHandler(async (req, res) => {
 // PUT /api/v1/books/:id — [admin/librarian]
 exports.updateBook = asyncHandler(async (req, res) => {
     let bookData = { ...req.body };
+    if (bookData.category && typeof bookData.category === 'object') {
+        bookData.category = bookData.category._id || bookData.category.id;
+    }
     if (bookData.coverImage && typeof bookData.coverImage === 'string' && bookData.coverImage.startsWith('data:image/')) {
         try {
             bookData.coverImage = await uploadBase64Image(bookData.coverImage, 'librasync/books');
@@ -133,4 +139,22 @@ exports.deleteBook = asyncHandler(async (req, res) => {
     const book = await Book.findByIdAndUpdate(req.params.id, { isActive: false });
     if (!book) throw new ApiError(404, 'Book not found');
     res.json(new ApiResponse(200, 'Book deleted'));
+});
+
+// GET /api/v1/books/category-counts
+exports.getCategoryCounts = asyncHandler(async (req, res) => {
+    const counts = await Book.aggregate([
+        { $match: { isActive: true } },
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $lookup: { from: 'categories', localField: '_id', foreignField: '_id', as: 'categoryDetails' } },
+        { $unwind: "$categoryDetails" },
+        { $project: { _id: 0, name: "$categoryDetails.name", count: 1 } }
+    ]);
+    res.json(new ApiResponse(200, 'Category counts retrieved', { counts }));
+});
+
+// GET /api/v1/books/categories/all
+exports.getCategories = asyncHandler(async (req, res) => {
+    const categories = await Category.find().sort({ name: 1 });
+    res.json(new ApiResponse(200, 'Categories retrieved', { categories }));
 });

@@ -58,67 +58,110 @@ const LibrarianDashboard = () => {
 
     const daysOverdue = (date) => Math.ceil((new Date() - new Date(date)) / 86400000);
 
-    if (loading) return <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading dashboard...</div>;
+    if (loading) return <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Loading dashboard...</div>;
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
-            <h1 className="text-3xl font-bold mb-2">Librarian Dashboard</h1>
-            <p className="text-gray-500 dark:text-slate-400 mb-8">Welcome back, {user?.name}</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Librarian Dashboard</h1>
+            <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Welcome back, {user?.name}</p>
 
             {/* Today's Activity Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 p-6 shadow-sm">
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-1">Books Issued Today</p>
-                    <p className="text-4xl font-bold text-gray-900 dark:text-white">{stats.issuedToday}</p>
+                <div
+                    className="rounded-2xl border p-6 shadow-sm"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Books Issued Today</p>
+                    <p className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>{stats.issuedToday}</p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 p-6 shadow-sm">
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-1">Books Returned Today</p>
-                    <p className="text-4xl font-bold text-gray-900 dark:text-white">{stats.returnedToday}</p>
+                <div
+                    className="rounded-2xl border p-6 shadow-sm"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Books Returned Today</p>
+                    <p className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>{stats.returnedToday}</p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 p-6 shadow-sm border-l-4 border-l-blue-500">
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mb-1">Total Active Borrows</p>
-                    <p className="text-4xl font-bold text-blue-600">{stats.activeBorrows}</p>
+                <div
+                    className="rounded-2xl border p-6 shadow-sm"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                        borderLeft: '4px solid var(--secondary)',
+                    }}
+                >
+                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Total Active Borrows</p>
+                    <p className="text-4xl font-bold" style={{ color: 'var(--secondary)' }}>{stats.activeBorrows}</p>
                 </div>
             </div>
 
             {/* Overdue Alerts */}
             <div>
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                     <span className="text-red-500">⚠️</span> Overdue Alerts
                 </h2>
                 
                 {overdueBorrows.length === 0 ? (
-                    <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-8 text-center text-gray-500 dark:text-slate-400 shadow-sm">
+                    <div
+                        className="rounded-xl border p-8 text-center shadow-sm"
+                        style={{
+                            backgroundColor: 'var(--surface)',
+                            borderColor: 'var(--border)',
+                            color: 'var(--text-secondary)',
+                        }}
+                    >
                         <span className="text-3xl mb-2 block">🎉</span>
                         <p>No overdue books right now!</p>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div
+                        className="rounded-xl border shadow-sm overflow-hidden"
+                        style={{
+                            backgroundColor: 'var(--surface)',
+                            borderColor: 'var(--border)',
+                        }}
+                    >
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 dark:bg-slate-700 border-b dark:border-slate-700">
+                            <thead style={{ backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                                 <tr>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Member</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Book</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Due Date</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Days Overdue</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Member</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Book</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Due Date</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Days Overdue</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y dark:divide-slate-700">
+                            <tbody className="divide-y" style={{ divideColor: 'var(--border)' }}>
                                 {overdueBorrows.map(borrow => (
-                                    <tr key={borrow._id} className="hover:bg-red-50/30 transition-colors">
+                                    <tr
+                                        key={borrow._id}
+                                        className="transition-colors"
+                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--danger-muted)'}
+                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                                    >
                                         <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-900 dark:text-white">{borrow.user?.name}</p>
-                                            <p className="text-sm text-gray-500 dark:text-slate-400">{borrow.user?.email}</p>
+                                            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{borrow.user?.name}</p>
+                                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{borrow.user?.email}</p>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-900 dark:text-white">{borrow.book?.title}</p>
-                                            <p className="text-sm text-gray-500 dark:text-slate-400">{borrow.book?.isbn}</p>
+                                            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{borrow.book?.title}</p>
+                                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{borrow.book?.isbn}</p>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
+                                        <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                                             {new Date(borrow.dueDate).toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+                                            <span
+                                                className="px-3 py-1 rounded-full text-sm font-medium"
+                                                style={{
+                                                    backgroundColor: 'var(--danger-muted)',
+                                                    color: 'var(--danger)',
+                                                }}
+                                            >
                                                 {daysOverdue(borrow.dueDate)} days
                                             </span>
                                         </td>

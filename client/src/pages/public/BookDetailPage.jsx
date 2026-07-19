@@ -322,7 +322,7 @@ const BookDetailPage = () => {
                                 <button
                                     onClick={handleBorrow}
                                     disabled={reserving}
-                                    className="w-full py-4 bg-[#0d5959] text-white font-bold rounded-xl hover:bg-[#0a4747] hover:shadow-lg hover:-translate-y-1 transition-all mb-3 disabled:opacity-50"
+                                    className="w-full py-4 text-white font-bold rounded-xl transition-all mb-3 disabled:opacity-50 ls-btn-primary"
                                 >
                                     {reserving ? 'Processing...' : 'Borrow Book'}
                                 </button>
@@ -330,7 +330,14 @@ const BookDetailPage = () => {
                                 <button
                                     onClick={handleReserve}
                                     disabled={reserving}
-                                    className="w-full py-4 bg-white dark:bg-slate-800 text-white font-bold rounded-xl hover:bg-black hover:shadow-lg hover:-translate-y-1 disabled:opacity-50 transition-all mb-3"
+                                    className="w-full py-4 font-bold rounded-xl transition-all mb-3 border disabled:opacity-50"
+                                    style={{
+                                        backgroundColor: 'var(--surface-hover)',
+                                        color: 'var(--text-primary)',
+                                        borderColor: 'var(--border)',
+                                    }}
+                                    onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--border-strong)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; }}
                                 >
                                     {reserving ? 'Reserving...' : 'Reserve Book'}
                                 </button>
@@ -563,20 +570,28 @@ const BookDetailPage = () => {
                                     value={reviewForm.title} 
                                     onChange={(e) => setReviewForm({...reviewForm, title: e.target.value})}
                                     placeholder="Summarize your thoughts"
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#0d5959] focus:ring-2 focus:ring-[#0d5959]/20 transition-all font-medium text-slate-700"
+                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 transition-all font-medium bg-transparent"
+                                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                                 />
                             </div>
                             <div className="mb-8">
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Review</label>
+                                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Review</label>
                                 <textarea 
                                     rows="4" 
                                     value={reviewForm.comment}
                                     onChange={(e) => setReviewForm({...reviewForm, comment: e.target.value})}
                                     placeholder="What did you like or dislike? What should others know before reading?"
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#0d5959] focus:ring-2 focus:ring-[#0d5959]/20 transition-all font-medium text-slate-700 resize-none"
+                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 transition-all font-medium bg-transparent resize-none"
+                                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                                 required></textarea>
                             </div>
-                            <button type="submit" className="w-full bg-[#0d5959] text-white font-bold py-4 rounded-xl hover:bg-[#0a4747] shadow-lg shadow-[#0d5959]/20 transition-all">
+                            <button
+                                type="submit"
+                                className="w-full text-white font-bold py-4 rounded-xl transition-all shadow-lg"
+                                style={{ backgroundColor: 'var(--primary)' }}
+                                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--primary-hover)'}
+                                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--primary)'}
+                            >
                                 {editingReviewId ? 'Update Review' : 'Post Review'}
                             </button>
                         </form>

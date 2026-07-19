@@ -23,36 +23,43 @@ const ForgotPasswordPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50 dark:bg-slate-700">
+        <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--background)' }}>
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold">Reset Password</h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Enter your email to get a reset link</p>
+                    <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Reset Password</h1>
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Enter your email to get a reset link</p>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-xl border dark:border-slate-700 p-8">
+                <div
+                    className="rounded-xl border p-8 shadow-sm"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
                     {success ? (
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--success-muted)', color: 'var(--success)' }}>
                                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Check your email</h2>
-                            <p className="text-slate-500 dark:text-slate-400 mb-6">We've sent a password reset link to {email}</p>
-                            <Link to="/login" className="text-blue-600 hover:underline font-medium">
+                            <h2 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Check your email</h2>
+                            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>We've sent a password reset link to {email}</p>
+                            <Link to="/login" className="font-medium hover:underline" style={{ color: 'var(--primary)' }}>
                                 Back to login
                             </Link>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Email Address</label>
+                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Email Address</label>
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-3 py-2.5 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700"
+                                    className="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                                     placeholder="you@email.com"
                                     required
                                 />
@@ -61,13 +68,16 @@ const ForgotPasswordPage = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-2.5 bg-[#0d5959] text-white rounded-lg hover:bg-[#0a4747] disabled:opacity-50 font-medium mt-4"
+                                className="w-full py-2.5 text-white rounded-lg disabled:opacity-50 font-medium mt-4 transition-all"
+                                style={{ backgroundColor: 'var(--primary)' }}
+                                onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
                             >
                                 {loading ? 'Sending...' : 'Send Reset Link'}
                             </button>
                             
                             <div className="text-center mt-6">
-                                <Link to="/login" className="text-sm text-slate-500 dark:text-slate-400 hover:text-gray-900">
+                                <Link to="/login" className="text-sm hover:underline" style={{ color: 'var(--text-secondary)' }}>
                                     Back to login
                                 </Link>
                             </div>

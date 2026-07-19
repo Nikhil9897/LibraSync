@@ -15,7 +15,7 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const inputClass = "w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[#0d5959] focus:border-transparent outline-none transition-all text-slate-800 dark:text-white placeholder-slate-400 text-sm";
+const inputClass = "w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all text-slate-800 dark:text-white placeholder-slate-400 text-sm";
 
 // ─── Register View ─────────────────────────────────────────────────────────────
 const RegisterView = ({ onSwitch, onClose }) => {
@@ -44,57 +44,74 @@ const RegisterView = ({ onSwitch, onClose }) => {
     return (
         <div>
             <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Create Account</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Join LibraSync to start borrowing books</p>
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Create Account</h2>
+                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Join LibraSync to start borrowing books</p>
             </div>
 
             <button
                 onClick={() => window.location.href = '/api/v1/auth/google'}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors mb-5 font-medium text-slate-700 dark:text-slate-200 text-sm"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-xl transition-colors mb-5 font-medium text-sm"
+                style={{
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--surface)',
+                }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--surface)'}
             >
                 <GoogleIcon /> Sign up with Google
             </button>
 
             <div className="relative mb-5">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200 dark:border-slate-600" /></div>
-                <div className="relative flex justify-center text-xs"><span className="bg-white dark:bg-slate-800 px-3 text-slate-400 font-medium">or sign up with email</span></div>
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t" style={{ borderColor: 'var(--border)' }} /></div>
+                <div className="relative flex justify-center text-xs">
+                    <span className="px-3 font-medium" style={{ backgroundColor: 'var(--surface)', color: 'var(--text-muted)' }}>
+                        or sign up with email
+                    </span>
+                </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Full Name</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Full Name</label>
                     <div className="relative">
-                        <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                         <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="John Doe"
                             className={inputClass + " pl-10"} />
                     </div>
                 </div>
                 <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Email</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Email</label>
                     <div className="relative">
-                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                         <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com"
                             className={inputClass + " pl-10"} />
                     </div>
                 </div>
                 <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Password</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Password</label>
                     <div className="relative">
-                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                         <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} placeholder="••••••••"
                             className={inputClass + " pl-10 tracking-widest font-mono text-base"} />
                     </div>
                 </div>
 
                 <button type="submit" disabled={loading}
-                    className="w-full py-3 bg-[#0d5959] hover:bg-[#0a4747] text-white font-bold rounded-xl transition-all shadow-md shadow-[#0d5959]/20 disabled:opacity-50 mt-2">
+                    className="w-full py-3 text-white font-bold rounded-xl transition-all disabled:opacity-50 mt-2"
+                    style={{
+                        backgroundColor: 'var(--primary)',
+                    }}
+                    onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
+                >
                     {loading ? 'Creating account…' : 'Create Account'}
                 </button>
             </form>
 
-            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-5">
+            <p className="text-center text-sm mt-5" style={{ color: 'var(--text-secondary)' }}>
                 Already have an account?{' '}
-                <button onClick={() => onSwitch('login')} className="text-[#0d5959] font-bold hover:text-[#d4a853] transition-colors">Sign in</button>
+                <button onClick={() => onSwitch('login')} className="font-bold transition-colors hover:underline" style={{ color: 'var(--primary)' }}>Sign in</button>
             </p>
         </div>
     );
@@ -123,12 +140,12 @@ const ForgotPasswordView = ({ onSwitch }) => {
     if (success) {
         return (
             <div className="text-center py-6">
-                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle size={32} className="text-emerald-600 dark:text-emerald-400" />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--success-muted)' }}>
+                    <CheckCircle size={32} style={{ color: 'var(--success)' }} />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Check your inbox</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">We've sent a reset link to <span className="font-semibold text-slate-700 dark:text-slate-300">{email}</span></p>
-                <button onClick={() => onSwitch('login')} className="text-[#0d5959] font-bold hover:text-[#d4a853] transition-colors text-sm">
+                <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Check your inbox</h2>
+                <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>We've sent a reset link to <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{email}</span></p>
+                <button onClick={() => onSwitch('login')} className="font-bold transition-colors text-sm hover:underline" style={{ color: 'var(--primary)' }}>
                     Back to login
                 </button>
             </div>
@@ -137,25 +154,31 @@ const ForgotPasswordView = ({ onSwitch }) => {
 
     return (
         <div>
-            <button onClick={() => onSwitch('login')} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white mb-5 text-sm font-medium transition-colors">
+            <button onClick={() => onSwitch('login')} className="flex items-center gap-2 mb-5 text-sm font-medium transition-colors hover:underline" style={{ color: 'var(--text-secondary)' }}>
                 <ArrowLeft size={16} /> Back to login
             </button>
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Reset Password</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Enter your email and we'll send you a reset link</p>
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Reset Password</h2>
+                <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Enter your email and we'll send you a reset link</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1.5 uppercase tracking-wide">Email Address</label>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Email Address</label>
                     <div className="relative">
-                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                         <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com"
                             className={inputClass + " pl-10"} />
                     </div>
                 </div>
                 <button type="submit" disabled={loading}
-                    className="w-full py-3 bg-[#0d5959] hover:bg-[#0a4747] text-white font-bold rounded-xl transition-all shadow-md shadow-[#0d5959]/20 disabled:opacity-50 mt-2">
+                    className="w-full py-3 text-white font-bold rounded-xl transition-all disabled:opacity-50 mt-2"
+                    style={{
+                        backgroundColor: 'var(--primary)',
+                    }}
+                    onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
+                >
                     {loading ? 'Sending…' : 'Send Reset Link'}
                 </button>
             </form>
@@ -164,13 +187,9 @@ const ForgotPasswordView = ({ onSwitch }) => {
 };
 
 // ─── Main Modal ────────────────────────────────────────────────────────────────
-/**
- * @param {{ isOpen: boolean, view: 'register'|'forgot', onClose: () => void }} props
- */
 const AuthModal = ({ isOpen, view: initialView, onClose }) => {
     const [view, setView] = useState(initialView || 'register');
 
-    // Sync with parent-controlled view
     const handleSwitch = (v) => setView(v);
 
     return (
@@ -197,11 +216,23 @@ const AuthModal = ({ isOpen, view: initialView, onClose }) => {
                         className="fixed inset-0 z-[201] flex items-center justify-center p-4"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700 p-8">
+                        <div
+                            className="relative w-full max-w-md rounded-3xl shadow-2xl p-8 border"
+                            style={{
+                                backgroundColor: 'var(--surface)',
+                                borderColor: 'var(--border)',
+                            }}
+                        >
                             {/* Close button */}
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                                className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+                                style={{
+                                    backgroundColor: 'var(--surface-hover)',
+                                    color: 'var(--text-secondary)',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--border)'}
+                                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
                             >
                                 <X size={18} />
                             </button>

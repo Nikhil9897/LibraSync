@@ -11,7 +11,7 @@ const errorHandler = require('./middleware/errorHandler');
 const rateLimiter = require('./middleware/rateLimiter');
 
 // Load env vars
-dotenv.config();
+dotenv.config(); // Restarted to load new Cohere key
 
 // Connect to database
 connectDB();

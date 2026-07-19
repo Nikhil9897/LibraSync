@@ -6,10 +6,11 @@ const ManageBooksPage = () => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
+    const [categories, setCategories] = useState([]);
     
     const [formData, setFormData] = useState({
         _id: '', title: '', author: '', isbn: '', 
-        description: '', totalCopies: 1, availableCopies: 1
+        description: '', totalCopies: 1, availableCopies: 1, category: ''
     });
 
     const fetchBooks = async () => {
@@ -24,8 +25,18 @@ const ManageBooksPage = () => {
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            const res = await api.get('/books/categories/all');
+            setCategories(res.data.data.categories);
+        } catch (err) {
+            console.error('Failed to load categories', err);
+        }
+    };
+
     useEffect(() => {
         fetchBooks();
+        fetchCategories();
     }, []);
 
     const handleInputChange = (e) => {
@@ -33,7 +44,10 @@ const ManageBooksPage = () => {
     };
 
     const handleEdit = (book) => {
-        setFormData({ ...book });
+        setFormData({ 
+            ...book,
+            category: book.category?._id || book.category || ''
+        });
         setIsEditing(true);
     };
 
@@ -60,8 +74,7 @@ const ManageBooksPage = () => {
                 await api.post('/books', createData);
                 toast.success('Book added successfully');
             }
-            // Reset form
-            setFormData({ _id: '', title: '', author: '', isbn: '', description: '', totalCopies: 1, availableCopies: 1 });
+            setFormData({ _id: '', title: '', author: '', isbn: '', description: '', totalCopies: 1, availableCopies: 1, category: '' });
             setIsEditing(false);
             fetchBooks();
         } catch (err) {
@@ -74,41 +87,123 @@ const ManageBooksPage = () => {
             
             {/* Form Section */}
             <div className="lg:w-1/3">
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 p-6 sticky top-8">
-                    <h2 className="text-xl font-bold mb-6">{isEditing ? 'Edit Book' : 'Add New Book'}</h2>
+                <div
+                    className="rounded-2xl border p-6 sticky top-8 shadow-sm"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>{isEditing ? 'Edit Book' : 'Add New Book'}</h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Title</label>
-                            <input type="text" name="title" value={formData.title} onChange={handleInputChange} required className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700" />
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Author</label>
-                            <input type="text" name="author" value={formData.author} onChange={handleInputChange} required className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700" />
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Author</label>
+                            <input
+                                type="text"
+                                name="author"
+                                value={formData.author}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">ISBN</label>
-                            <input type="text" name="isbn" value={formData.isbn} onChange={handleInputChange} required className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700" />
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>ISBN</label>
+                            <input
+                                type="text"
+                                name="isbn"
+                                value={formData.isbn}
+                                onChange={handleInputChange}
+                                required
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Category</label>
+                            <select 
+                                name="category" 
+                                value={formData.category} 
+                                onChange={handleInputChange} 
+                                required 
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            >
+                                <option value="" style={{ backgroundColor: 'var(--surface)' }}>Select a Category</option>
+                                {categories.map(cat => (
+                                    <option key={cat._id} value={cat._id} style={{ backgroundColor: 'var(--surface)' }}>{cat.name}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Total Copies</label>
-                                <input type="number" name="totalCopies" min="1" value={formData.totalCopies} onChange={handleInputChange} required className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700" />
+                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Total Copies</label>
+                                <input
+                                    type="number"
+                                    name="totalCopies"
+                                    min="1"
+                                    value={formData.totalCopies}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Available</label>
-                                <input type="number" name="availableCopies" min="0" value={formData.availableCopies} onChange={handleInputChange} required className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700" />
+                                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Available</label>
+                                <input
+                                    type="number"
+                                    name="availableCopies"
+                                    min="0"
+                                    value={formData.availableCopies}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Description</label>
-                            <textarea name="description" rows="3" value={formData.description} onChange={handleInputChange} className="w-full px-3 py-2 border dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700 resize-none" />
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Description</label>
+                            <textarea
+                                name="description"
+                                rows="3"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent resize-none"
+                                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            />
                         </div>
                         <div className="pt-2 flex gap-3">
-                            <button type="submit" className="flex-1 bg-[#0d5959] text-white py-2 rounded-lg font-medium hover:bg-[#0a4747] transition-colors">
+                            <button
+                                type="submit"
+                                className="flex-1 text-white py-2 rounded-lg font-medium transition-colors"
+                                style={{ backgroundColor: 'var(--primary)' }}
+                                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--primary-hover)'}
+                                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--primary)'}
+                            >
                                 {isEditing ? 'Update Book' : 'Save Book'}
                             </button>
                             {isEditing && (
-                                <button type="button" onClick={() => { setIsEditing(false); setFormData({ _id: '', title: '', author: '', isbn: '', description: '', totalCopies: 1, availableCopies: 1 }); }} className="px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsEditing(false); setFormData({ _id: '', title: '', author: '', isbn: '', description: '', totalCopies: 1, availableCopies: 1, category: '' }); }}
+                                    className="px-4 py-2 rounded-lg font-medium transition-colors"
+                                    style={{ backgroundColor: 'var(--surface-hover)', color: 'var(--text-primary)' }}
+                                >
                                     Cancel
                                 </button>
                             )}
@@ -119,37 +214,64 @@ const ManageBooksPage = () => {
 
             {/* List Section */}
             <div className="lg:w-2/3">
-                <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Manage Library Books</h2>
+                <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Manage Library Books</h2>
                 {loading ? (
-                    <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading books...</div>
+                    <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Loading books...</div>
                 ) : (
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
+                    <div
+                        className="rounded-2xl border overflow-hidden shadow-sm"
+                        style={{
+                            backgroundColor: 'var(--surface)',
+                            borderColor: 'var(--border)',
+                        }}
+                    >
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 dark:bg-slate-700 border-b dark:border-slate-700">
+                            <thead style={{ backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                                 <tr>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Book Info</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Stock</th>
-                                    <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400 text-right">Actions</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Book Info</th>
+                                    <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Stock</th>
+                                    <th className="px-6 py-4 text-sm font-semibold text-right" style={{ color: 'var(--text-secondary)' }}>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y dark:divide-slate-700">
+                            <tbody className="divide-y" style={{ divideColor: 'var(--border)' }}>
                                 {books.map((book) => (
-                                    <tr key={book._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors">
+                                    <tr
+                                        key={book._id}
+                                        className="transition-colors"
+                                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                                    >
                                         <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-900 dark:text-white">{book.title}</p>
-                                            <p className="text-sm text-gray-500 dark:text-slate-400">{book.author} • {book.isbn}</p>
+                                            <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{book.title}</p>
+                                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{book.author} • {book.isbn}</p>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col text-sm">
-                                                <span className={`${book.availableCopies > 0 ? 'text-green-600 font-medium' : 'text-red-500 font-medium'}`}>
+                                                <span style={{ color: book.availableCopies > 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 500 }}>
                                                     {book.availableCopies} available
                                                 </span>
-                                                <span className="text-gray-500 dark:text-slate-400">{book.totalCopies} total</span>
+                                                <span style={{ color: 'var(--text-secondary)' }}>{book.totalCopies} total</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button onClick={() => handleEdit(book)} className="text-blue-600 hover:text-blue-800 font-medium text-sm mr-4">Edit</button>
-                                            <button onClick={() => handleDelete(book._id)} className="text-red-600 hover:text-red-800 font-medium text-sm">Remove</button>
+                                            <button
+                                                onClick={() => handleEdit(book)}
+                                                className="font-medium text-sm mr-4 transition-colors"
+                                                style={{ color: 'var(--secondary)' }}
+                                                onMouseEnter={e => e.currentTarget.style.color = 'var(--secondary-hover)'}
+                                                onMouseLeave={e => e.currentTarget.style.color = 'var(--secondary)'}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(book._id)}
+                                                className="font-medium text-sm transition-colors"
+                                                style={{ color: 'var(--danger)' }}
+                                                onMouseEnter={e => e.currentTarget.style.color = 'var(--danger)'}
+                                                onMouseLeave={e => e.currentTarget.style.color = 'var(--danger)'}
+                                            >
+                                                Remove
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

@@ -41,7 +41,6 @@ const IssueBookPage = () => {
             setSelectedUser('');
             setSelectedBook('');
             
-            // Refresh book availability
             const booksRes = await api.get('/books?limit=500');
             setBooks(booksRes.data.data.books.filter(b => b.availableCopies > 0));
         } catch (err) {
@@ -51,26 +50,33 @@ const IssueBookPage = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading form data...</div>;
+    if (loading) return <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Loading form data...</div>;
 
     return (
         <div className="max-w-2xl mx-auto py-12 px-4">
-            <h1 className="text-3xl font-bold mb-2 text-slate-900 dark:text-white">Issue Book</h1>
-            <p className="text-slate-500 dark:text-slate-400 mb-8">Select a member and an available book to check out.</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Issue Book</h1>
+            <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>Select a member and an available book to check out.</p>
 
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 p-8">
+            <div
+                className="rounded-2xl shadow-sm border p-8"
+                style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                }}
+            >
                 <form onSubmit={handleIssue} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Library Member</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Library Member</label>
                         <select
                             value={selectedUser}
                             onChange={(e) => setSelectedUser(e.target.value)}
                             required
-                            className="w-full px-4 py-3 border dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700 bg-gray-50 dark:bg-slate-700"
+                            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                            style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                         >
-                            <option value="" disabled>-- Select a Member --</option>
+                            <option value="" disabled style={{ backgroundColor: 'var(--surface)' }}>-- Select a Member --</option>
                             {users.map(u => (
-                                <option key={u._id} value={u._id}>
+                                <option key={u._id} value={u._id} style={{ backgroundColor: 'var(--surface)' }}>
                                     {u.name} ({u.email})
                                 </option>
                             ))}
@@ -78,16 +84,17 @@ const IssueBookPage = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Available Book</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Available Book</label>
                         <select
                             value={selectedBook}
                             onChange={(e) => setSelectedBook(e.target.value)}
                             required
-                            className="w-full px-4 py-3 border dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:text-white dark:border-slate-700 bg-gray-50 dark:bg-slate-700"
+                            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[var(--primary)] outline-none bg-transparent"
+                            style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                         >
-                            <option value="" disabled>-- Select a Book --</option>
+                            <option value="" disabled style={{ backgroundColor: 'var(--surface)' }}>-- Select a Book --</option>
                             {books.map(b => (
-                                <option key={b._id} value={b._id}>
+                                <option key={b._id} value={b._id} style={{ backgroundColor: 'var(--surface)' }}>
                                     {b.title} by {b.author} - {b.availableCopies} available
                                 </option>
                             ))}
@@ -98,7 +105,10 @@ const IssueBookPage = () => {
                         <button
                             type="submit"
                             disabled={issuing}
-                            className="w-full py-3 bg-[#0d5959] text-white text-lg font-medium rounded-xl hover:bg-[#0a4747] disabled:opacity-50 transition-colors shadow-sm"
+                            className="w-full py-3 text-white text-lg font-medium rounded-xl disabled:opacity-50 transition-colors shadow-sm"
+                            style={{ backgroundColor: 'var(--primary)' }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--primary-hover)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--primary)'}
                         >
                             {issuing ? 'Processing...' : 'Confirm Issue'}
                         </button>

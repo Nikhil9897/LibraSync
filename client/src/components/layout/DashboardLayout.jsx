@@ -50,19 +50,14 @@ const DashboardLayout = () => {
 
     useEffect(() => {
         fetchNotifications();
-        // Poll for new notifications every 60 seconds
         const interval = setInterval(fetchNotifications, 60000);
         return () => clearInterval(interval);
     }, []);
 
-    // Refetch when the notification dropdown is opened
     useEffect(() => {
-        if (showNotifications) {
-            fetchNotifications();
-        }
+        if (showNotifications) fetchNotifications();
     }, [showNotifications]);
 
-    // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -97,16 +92,17 @@ const DashboardLayout = () => {
         }
     };
 
+    // Notification icons use semantic colors (not --primary for everything)
     const getNotificationIcon = (type) => {
         switch(type) {
-            case 'due_reminder': return <Clock size={16} className="text-amber-500" />;
-            case 'overdue': return <AlertTriangle size={16} className="text-red-500" />;
-            case 'reservation': return <Bookmark size={16} className="text-[#0d5959] dark:text-teal-400" />;
-            case 'fine': return <DollarSign size={16} className="text-red-500" />;
-            case 'announcement': return <Info size={16} className="text-[#0d5959]" />;
-            case 'borrow': return <BookOpen size={16} className="text-[#0d5959]" />;
-            case 'system': return <Bell size={16} className="text-slate-500 dark:text-slate-400" />;
-            default: return <Bell size={16} className="text-[#0d5959]" />;
+            case 'due_reminder': return <Clock size={16} style={{ color: 'var(--warning)' }} />;
+            case 'overdue':      return <AlertTriangle size={16} style={{ color: 'var(--danger)' }} />;
+            case 'reservation':  return <Bookmark size={16} style={{ color: 'var(--secondary)' }} />;
+            case 'fine':         return <DollarSign size={16} style={{ color: 'var(--danger)' }} />;
+            case 'announcement': return <Info size={16} style={{ color: 'var(--secondary)' }} />;
+            case 'borrow':       return <BookOpen size={16} style={{ color: 'var(--primary)' }} />;
+            case 'system':       return <Bell size={16} style={{ color: 'var(--text-secondary)' }} />;
+            default:             return <Bell size={16} style={{ color: 'var(--primary)' }} />;
         }
     };
 
@@ -133,7 +129,6 @@ const DashboardLayout = () => {
             { path: '/librarian/return', label: 'Return Book', icon: <Download size={20} /> },
         ];
     } else {
-        // Member mode
         menuItems = [
             { path: '/dashboard', label: 'My Dashboard', icon: <LayoutDashboard size={20} /> },
             { path: '/dashboard/borrows', label: 'My Borrows', icon: <BookOpen size={20} /> },
@@ -147,14 +142,16 @@ const DashboardLayout = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300" style={{ fontFamily: "'Inter', sans-serif" }}>
-            {/* Premium Sidebar Panel */}
+        <div className="flex min-h-screen transition-colors duration-300" style={{ backgroundColor: 'var(--background)', fontFamily: "'Inter', sans-serif" }}>
+            {/* Sidebar */}
             <motion.aside 
                 initial={false}
                 animate={isMobile ? { x: collapsed ? '-100%' : 0, width: 280 } : { width: collapsed ? 80 : 280, x: 0 }}
-                className="bg-slate-50 dark:bg-slate-900 md:rounded-r-3xl transition-all duration-300 fixed h-[100vh] md:h-[98vh] top-0 md:top-[1vh] z-[70] flex flex-col shadow-2xl overflow-hidden"
+                className="md:rounded-r-3xl transition-all duration-300 fixed h-[100vh] md:h-[98vh] top-0 md:top-[1vh] z-[70] flex flex-col shadow-2xl overflow-hidden"
+                style={{ backgroundColor: 'var(--sidebar)' }}
             >
-                <div className="h-20 flex items-center justify-between px-6 border-b dark:border-slate-700 border-slate-200/60 dark:border-slate-700 backdrop-blur-sm">
+                {/* Logo Row */}
+                <div className="h-20 flex items-center justify-between px-6" style={{ borderBottom: '1px solid var(--border)' }}>
                     <AnimatePresence>
                         {(!collapsed || isMobile) && (
                             <motion.div
@@ -164,43 +161,70 @@ const DashboardLayout = () => {
                             >
                                 <Link 
                                     to="/" 
-                                    className="flex items-center gap-3 text-[#1a1f36] dark:text-white hover:opacity-90 transition-opacity"
+                                    className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+                                    style={{ color: 'var(--text-primary)' }}
                                 >
-                                    <BookOpen size={28} className="text-[#0d5959]" strokeWidth={2.5} />
-                                    <span className="font-bold text-2xl tracking-tight tracking-tight whitespace-nowrap">LibraSync</span>
+                                    <BookOpen size={28} strokeWidth={2.5} style={{ color: 'var(--primary)' }} />
+                                    <span className="font-bold text-2xl tracking-tight whitespace-nowrap">LibraSync</span>
                                 </Link>
                             </motion.div>
                         )}
                     </AnimatePresence>
-                    <button onClick={() => setCollapsed(!collapsed)} className={`p-2 text-slate-500 dark:text-slate-400 hover:text-[#1a1f36] dark:text-white hover:bg-white dark:bg-slate-800 rounded-xl transition-all ml-auto ${isMobile ? 'hidden' : ''}`}>
+                    <button
+                        onClick={() => setCollapsed(!collapsed)}
+                        className={`p-2 rounded-xl transition-all ml-auto ${isMobile ? 'hidden' : ''}`}
+                        style={{ color: 'var(--text-secondary)' }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
                         <Menu size={22} />
                     </button>
                 </div>
 
-                {/* Enhanced User Profile Card */}
+                {/* User Profile Card */}
                 <AnimatePresence>
                     {(!collapsed || isMobile) && (
                         <motion.div 
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="p-6 border-b dark:border-slate-700 border-slate-200/60 dark:border-slate-700"
+                            className="p-6"
+                            style={{ borderBottom: '1px solid var(--border)' }}
                         >
                             <div className="flex items-center gap-4">
                                 <div className="relative">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#FCD34D] text-[#115E59] flex items-center justify-center font-bold text-xl shadow-lg border-2 border-white/20 overflow-hidden shrink-0">
+                                    <div
+                                        className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-lg border-2 overflow-hidden shrink-0"
+                                        style={{
+                                            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                                            color: '#fff',
+                                            borderColor: 'var(--border)',
+                                        }}
+                                    >
                                         {user?.avatar ? (
                                             <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
                                             user?.name?.charAt(0).toUpperCase() || 'U'
                                         )}
                                     </div>
-                                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 border-2 border-[#0F766E] rounded-full"></div>
+                                    <div
+                                        className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full"
+                                        style={{ backgroundColor: 'var(--success)', border: '2px solid var(--sidebar)' }}
+                                    />
                                 </div>
                                 <div className="overflow-hidden">
-                                    <p className="text-base font-bold text-[#1a1f36] dark:text-white truncate">{user?.name || 'User'}</p>
+                                    <p className="text-base font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                                        {user?.name || 'User'}
+                                    </p>
                                     <div className="flex items-center gap-2 mt-1">
-                                        <span className="inline-flex px-2 py-0.5 bg-[#D4AF37]/20 border dark:border-slate-700 border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold rounded-md capitalize shadow-sm">
+                                        <span
+                                            className="inline-flex px-2 py-0.5 text-xs font-bold rounded-md capitalize"
+                                            style={{
+                                                backgroundColor: 'var(--primary-muted)',
+                                                color: 'var(--primary)',
+                                                border: '1px solid var(--border)',
+                                            }}
+                                        >
                                             {user?.role || 'Member'}
                                         </span>
                                     </div>
@@ -210,7 +234,8 @@ const DashboardLayout = () => {
                     )}
                 </AnimatePresence>
 
-                <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide">
+                {/* Nav Items */}
+                <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-hide">
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path || (item.path !== '/dashboard' && item.path !== '/admin' && item.path !== '/librarian/dashboard' && location.pathname.startsWith(item.path));
                         const handlePreload = () => {
@@ -219,33 +244,48 @@ const DashboardLayout = () => {
                         };
                         return (
                             <div key={item.path}>
-                                {item.divider && <hr className="my-6 border-slate-200/60 dark:border-slate-700 mx-2" />}
+                                {item.divider && <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />}
                                 <Link
                                     to={item.path}
                                     onClick={() => isMobile && setCollapsed(true)}
                                     onMouseEnter={handlePreload}
                                     onFocus={handlePreload}
                                     title={collapsed && !isMobile ? item.label : undefined}
-                                    className={`relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 group overflow-hidden ${
-                                        isActive
-                                            ? 'bg-white dark:bg-slate-800 text-[#0d5959] dark:text-teal-400 shadow-lg shadow-black/5'
-                                            : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:bg-slate-800 hover:text-[#1a1f36] dark:text-white'
-                                    }`}
+                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                    style={{
+                                        backgroundColor: isActive ? 'var(--surface-hover)' : 'transparent',
+                                        color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                                    }}
+                                    onMouseEnter={e => {
+                                        handlePreload();
+                                        if (!isActive) {
+                                            e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                                            e.currentTarget.style.color = 'var(--text-primary)';
+                                        }
+                                    }}
+                                    onMouseLeave={e => {
+                                        if (!isActive) {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                            e.currentTarget.style.color = 'var(--text-secondary)';
+                                        }
+                                    }}
                                 >
                                     {isActive && (
                                         <motion.div 
                                             layoutId="activeIndicator"
-                                            className="absolute left-0 top-1/4 bottom-1/4 w-1.5 bg-[#0d5959] dark:bg-teal-400 rounded-r-full shadow-[0_0_12px_rgba(13,89,89,0.5)] dark:shadow-[0_0_12px_rgba(45,212,191,0.5)]" 
+                                            className="absolute left-0 top-1/4 bottom-1/4 w-1 rounded-r-full"
+                                            style={{ backgroundColor: 'var(--primary)' }}
                                         />
                                     )}
-                                    <span className={`${isActive ? 'text-[#0d5959] dark:text-teal-400' : 'text-slate-500 group-hover:text-[#1a1f36] dark:text-white'} transition-colors shrink-0`}>
-                                        {item.icon}
-                                    </span>
+                                    <span className="shrink-0">{item.icon}</span>
                                     {(!collapsed || isMobile) && (
                                         <span className="flex-1 truncate">{item.label}</span>
                                     )}
                                     {(!collapsed || isMobile) && item.badge && (
-                                        <span className="bg-blue-500 text-[#1a1f36] dark:text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-md ml-auto">
+                                        <span
+                                            className="text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto"
+                                            style={{ backgroundColor: 'var(--danger)', color: '#fff' }}
+                                        >
                                             {item.badge}
                                         </span>
                                     )}
@@ -254,40 +294,50 @@ const DashboardLayout = () => {
                         );
                     })}
 
-                    {/* Switch Portal Button */}
+                    {/* Switch Portal */}
                     {(user?.role === 'admin' || user?.role === 'librarian') && (
                         <div className="mt-8">
-                            <hr className="my-6 border-slate-200/60 dark:border-slate-700 mx-2" />
+                            <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />
                             {(isAdminMode || isLibrarianMode) ? (
                                 <Link
                                     to="/dashboard"
                                     onClick={() => isMobile && setCollapsed(true)}
-                                    title={collapsed && !isMobile ? "Member View" : undefined}
-                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-white dark:bg-slate-800 hover:text-[#1a1f36] dark:text-white transition-all duration-300 group overflow-hidden"
+                                    title={collapsed && !isMobile ? 'Member View' : undefined}
+                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                    style={{ color: 'var(--text-secondary)' }}
+                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
                                 >
-                                    <span className="text-slate-500 group-hover:text-[#1a1f36] dark:text-white transition-colors shrink-0"><User size={20} /></span>
+                                    <span className="shrink-0"><User size={20} /></span>
                                     {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to Member View</span>}
                                 </Link>
                             ) : (
                                 <Link
                                     to={user?.role === 'admin' ? '/admin' : '/librarian/dashboard'}
                                     onClick={() => isMobile && setCollapsed(true)}
-                                    title={collapsed && !isMobile ? "Admin View" : undefined}
-                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-500 dark:text-slate-400 hover:bg-white dark:bg-slate-800 hover:text-[#1a1f36] dark:text-white transition-all duration-300 group overflow-hidden"
+                                    title={collapsed && !isMobile ? 'Admin View' : undefined}
+                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                    style={{ color: 'var(--text-secondary)' }}
+                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
                                 >
-                                    <span className="text-slate-500 group-hover:text-[#1a1f36] dark:text-white transition-colors shrink-0"><Settings size={20} /></span>
+                                    <span className="shrink-0"><Settings size={20} /></span>
                                     {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to {user?.role === 'admin' ? 'Admin' : 'Librarian'} View</span>}
                                 </Link>
                             )}
                         </div>
                     )}
                 </nav>
-                
-                <div className="p-5 border-t dark:border-slate-700 border-slate-200/60 dark:border-slate-700 bg-black/10 backdrop-blur-md">
+
+                {/* Sign Out */}
+                <div className="p-5" style={{ borderTop: '1px solid var(--border)' }}>
                     <button 
                         onClick={logout} 
-                        title={collapsed && !isMobile ? "Sign Out" : undefined}
-                        className={`flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 rounded-2xl transition-all duration-300 ${(collapsed && !isMobile) ? 'justify-center' : ''}`}
+                        title={collapsed && !isMobile ? 'Sign Out' : undefined}
+                        className={`flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-250 ${(collapsed && !isMobile) ? 'justify-center' : ''}`}
+                        style={{ color: 'var(--danger)' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--danger-muted)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     >
                         <LogOut size={20} className="shrink-0" />
                         {(!collapsed || isMobile) && <span className="truncate">Sign Out</span>}
@@ -308,19 +358,26 @@ const DashboardLayout = () => {
                 )}
             </AnimatePresence>
 
-            {/* Main Content Area */}
+            {/* Main Content */}
             <main className={`${isMobile ? 'ml-0' : (collapsed ? 'ml-[100px]' : 'ml-[300px]')} flex-1 flex flex-col min-h-screen transition-all duration-300 w-full overflow-x-hidden`}>
-                {/* Top Glass Header for Mobile/Context */}
-                <header className="h-20 bg-slate-50 dark:bg-slate-900/80 backdrop-blur-xl border-b dark:border-slate-700 border-slate-200/60 dark:border-slate-700 sticky top-0 z-40 flex items-center px-6 sm:px-10 shadow-sm transition-all duration-300">
+                {/* Top Header */}
+                <header
+                    className="h-20 backdrop-blur-xl sticky top-0 z-40 flex items-center px-6 sm:px-10 shadow-sm transition-all duration-300"
+                    style={{
+                        backgroundColor: 'var(--background)',
+                        borderBottom: '1px solid var(--border)',
+                    }}
+                >
                     {isMobile && (
                         <button 
                             onClick={() => setCollapsed(false)} 
-                            className="mr-4 p-2 text-slate-500 dark:text-slate-400 hover:text-[#1a1f36] dark:text-white rounded-xl transition-all"
+                            className="mr-4 p-2 rounded-xl transition-all"
+                            style={{ color: 'var(--text-secondary)' }}
                         >
                             <Menu size={24} />
                         </button>
                     )}
-                    <h2 className="text-lg sm:text-2xl font-bold text-[#1a1f36] dark:text-white truncate max-w-[200px] sm:max-w-none">
+                    <h2 className="text-lg sm:text-2xl font-bold truncate max-w-[200px] sm:max-w-none" style={{ color: 'var(--text-primary)' }}>
                         {menuItems.find(i => i.path === location.pathname)?.label || 'Overview'}
                     </h2>
                     <div className="flex items-center gap-3 sm:gap-6 ml-auto">
@@ -329,7 +386,10 @@ const DashboardLayout = () => {
                         <div className="relative" ref={themeMenuRef}>
                             <button 
                                 onClick={() => setShowThemeMenu(!showThemeMenu)}
-                                className="relative p-2.5 transition-all duration-300 rounded-full text-slate-500 dark:text-slate-400 hover:text-[#0d5959] dark:hover:text-teal-400 hover:bg-slate-100 dark:hover:bg-white dark:bg-slate-800"
+                                className="relative p-2.5 transition-all duration-300 rounded-full"
+                                style={{ color: showThemeMenu ? 'var(--primary)' : 'var(--text-secondary)' }}
+                                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = showThemeMenu ? 'var(--primary)' : 'var(--text-secondary)'; }}
                             >
                                 {theme === 'light' ? <Sun size={22} /> : theme === 'dark' ? <Moon size={22} /> : <Monitor size={22} />}
                             </button>
@@ -341,26 +401,31 @@ const DashboardLayout = () => {
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                         transition={{ duration: 0.2 }}
-                                        className="absolute right-0 mt-3 w-40 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 overflow-hidden z-50 p-2"
+                                        className="absolute right-0 mt-3 w-40 rounded-2xl shadow-2xl overflow-hidden z-50 p-2"
+                                        style={{
+                                            backgroundColor: 'var(--surface)',
+                                            border: '1px solid var(--border)',
+                                        }}
                                     >
-                                        <button 
-                                            onClick={() => { setTheme('light'); setShowThemeMenu(false); }}
-                                            className={`flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors ${theme === 'light' ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#0d5959] dark:text-teal-400' : 'text-slate-600 dark:text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-                                        >
-                                            <Sun size={18} /> Light
-                                        </button>
-                                        <button 
-                                            onClick={() => { setTheme('dark'); setShowThemeMenu(false); }}
-                                            className={`flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors mt-1 ${theme === 'dark' ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#0d5959] dark:text-teal-400' : 'text-slate-600 dark:text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-                                        >
-                                            <Moon size={18} /> Dark
-                                        </button>
-                                        <button 
-                                            onClick={() => { setTheme('system'); setShowThemeMenu(false); }}
-                                            className={`flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors mt-1 ${theme === 'system' ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#0d5959] dark:text-teal-400' : 'text-slate-600 dark:text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
-                                        >
-                                            <Monitor size={18} /> System
-                                        </button>
+                                        {[
+                                            { key: 'light', label: 'Light', icon: <Sun size={18} /> },
+                                            { key: 'dark', label: 'Dark', icon: <Moon size={18} /> },
+                                            { key: 'system', label: 'System', icon: <Monitor size={18} /> },
+                                        ].map(opt => (
+                                            <button 
+                                                key={opt.key}
+                                                onClick={() => { setTheme(opt.key); setShowThemeMenu(false); }}
+                                                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors mt-0.5"
+                                                style={{
+                                                    backgroundColor: theme === opt.key ? 'var(--primary-muted)' : 'transparent',
+                                                    color: theme === opt.key ? 'var(--primary)' : 'var(--text-secondary)',
+                                                }}
+                                                onMouseEnter={e => { if (theme !== opt.key) { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}}
+                                                onMouseLeave={e => { if (theme !== opt.key) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}}
+                                            >
+                                                {opt.icon} {opt.label}
+                                            </button>
+                                        ))}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -370,11 +435,17 @@ const DashboardLayout = () => {
                         <div className="relative" ref={notificationRef}>
                             <button 
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className={`relative p-2.5 transition-all duration-300 rounded-full ${showNotifications ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#0d5959] dark:text-teal-400' : 'text-slate-500 dark:text-slate-400 hover:text-[#0d5959] dark:hover:text-teal-400 hover:bg-slate-100 dark:hover:bg-white dark:bg-slate-800'}`}
+                                className="relative p-2.5 transition-all duration-300 rounded-full"
+                                style={{ color: showNotifications ? 'var(--primary)' : 'var(--text-secondary)' }}
+                                onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--primary)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = showNotifications ? 'var(--primary)' : 'var(--text-secondary)'; }}
                             >
                                 <Bell size={22} />
                                 {unreadCount > 0 && (
-                                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-200/60 dark:border-slate-700 shadow-sm"></span>
+                                    <span
+                                        className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full"
+                                        style={{ backgroundColor: 'var(--danger)', border: '2px solid var(--background)' }}
+                                    />
                                 )}
                             </button>
 
@@ -385,22 +456,39 @@ const DashboardLayout = () => {
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                         transition={{ duration: 0.2 }}
-                                        className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 overflow-hidden z-50"
+                                        className="absolute right-0 mt-3 w-80 rounded-3xl shadow-2xl overflow-hidden z-50"
+                                        style={{
+                                            backgroundColor: 'var(--surface)',
+                                            border: '1px solid var(--border)',
+                                        }}
                                     >
-                                        <div className="flex justify-between items-center p-5 border-b dark:border-slate-700 border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 backdrop-blur-sm">
+                                        <div className="flex justify-between items-center p-5" style={{ borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface-2)' }}>
                                             <div>
-                                                <h3 className="font-bold text-[#1a1f36] dark:text-white">Notifications</h3>
+                                                <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Notifications</h3>
                                                 {unreadCount > 0 && (
-                                                    <span className="text-xs font-bold text-[#0d5959] dark:text-teal-400">{unreadCount} unread</span>
+                                                    <span className="text-xs font-bold" style={{ color: 'var(--primary)' }}>{unreadCount} unread</span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 {unreadCount > 0 && (
-                                                    <button onClick={markAllAsRead} className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#0d5959] dark:hover:text-teal-400 transition-colors">
+                                                    <button
+                                                        onClick={markAllAsRead}
+                                                        className="text-xs font-semibold transition-colors"
+                                                        style={{ color: 'var(--text-secondary)' }}
+                                                        onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
+                                                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+                                                    >
                                                         Mark all read
                                                     </button>
                                                 )}
-                                                <Link to="/dashboard/notifications" onClick={() => setShowNotifications(false)} className="text-sm font-semibold text-[#0d5959] hover:text-[#B4932D] dark:hover:text-[#FCD34D] transition-colors">
+                                                <Link
+                                                    to="/dashboard/notifications"
+                                                    onClick={() => setShowNotifications(false)}
+                                                    className="text-sm font-semibold transition-colors"
+                                                    style={{ color: 'var(--secondary)' }}
+                                                    onMouseEnter={e => e.currentTarget.style.color = 'var(--secondary-hover)'}
+                                                    onMouseLeave={e => e.currentTarget.style.color = 'var(--secondary)'}
+                                                >
                                                     View All
                                                 </Link>
                                             </div>
@@ -408,8 +496,8 @@ const DashboardLayout = () => {
                                         <div className="max-h-[360px] overflow-y-auto">
                                             {notifications.length === 0 ? (
                                                 <div className="p-10 text-center">
-                                                    <Bell size={32} className="mx-auto mb-3 text-slate-300 dark:text-slate-600" />
-                                                    <p className="text-slate-500 dark:text-slate-400 font-semibold text-sm">You're all caught up!</p>
+                                                    <Bell size={32} className="mx-auto mb-3" style={{ color: 'var(--border-strong)' }} />
+                                                    <p className="font-semibold text-sm" style={{ color: 'var(--text-secondary)' }}>You're all caught up!</p>
                                                 </div>
                                             ) : (
                                                 <div className="flex flex-col">
@@ -417,26 +505,39 @@ const DashboardLayout = () => {
                                                         <div 
                                                             key={n._id}
                                                             onClick={() => { markAsRead(n._id, n.isRead); setShowNotifications(false); }}
-                                                            className={`p-4 border-b dark:border-slate-700 border-slate-100 flex gap-3 cursor-pointer transition-colors ${
-                                                                !n.isRead
-                                                                    ? 'bg-teal-50/60 dark:bg-teal-900/20 hover:bg-teal-50 dark:hover:bg-teal-900/30'
-                                                                    : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                                                            }`}
+                                                            className="p-4 flex gap-3 cursor-pointer transition-colors"
+                                                            style={{
+                                                                borderBottom: '1px solid var(--border)',
+                                                                backgroundColor: !n.isRead ? 'var(--primary-muted)' : 'transparent',
+                                                            }}
+                                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = !n.isRead ? 'var(--primary-muted)' : 'transparent'}
                                                         >
-                                                            <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${
-                                                                !n.isRead ? 'bg-white dark:bg-slate-700 shadow-sm border dark:border-slate-600 border-slate-100' : 'bg-slate-100 dark:bg-slate-700'
-                                                            }`}>
+                                                            <div
+                                                                className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+                                                                style={{
+                                                                    backgroundColor: !n.isRead ? 'var(--surface)' : 'var(--surface-hover)',
+                                                                    border: !n.isRead ? '1px solid var(--border)' : 'none',
+                                                                }}
+                                                            >
                                                                 {getNotificationIcon(n.type)}
                                                             </div>
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex items-start justify-between gap-2">
-                                                                    <h4 className={`text-sm font-bold leading-tight truncate ${
-                                                                        !n.isRead ? 'text-[#0d5959] dark:text-teal-400' : 'text-slate-700 dark:text-slate-200'
-                                                                    }`}>{n.title}</h4>
-                                                                    {!n.isRead && <span className="w-2 h-2 bg-teal-500 rounded-full shrink-0 mt-1"></span>}
+                                                                    <h4
+                                                                        className="text-sm font-bold leading-tight truncate"
+                                                                        style={{ color: !n.isRead ? 'var(--primary)' : 'var(--text-primary)' }}
+                                                                    >
+                                                                        {n.title}
+                                                                    </h4>
+                                                                    {!n.isRead && (
+                                                                        <span className="w-2 h-2 rounded-full shrink-0 mt-1" style={{ backgroundColor: 'var(--primary)' }} />
+                                                                    )}
                                                                 </div>
-                                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">{n.message}</p>
-                                                                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider">{new Date(n.createdAt).toLocaleDateString()}</p>
+                                                                <p className="text-xs line-clamp-1 mt-0.5" style={{ color: 'var(--text-secondary)' }}>{n.message}</p>
+                                                                <p className="text-[10px] font-bold mt-1 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                                                                    {new Date(n.createdAt).toLocaleDateString()}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -448,8 +549,16 @@ const DashboardLayout = () => {
                             </AnimatePresence>
                         </div>
 
-                        {/* Profile Image */}
-                        <Link to="/dashboard/profile" className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#D4AF37] to-[#FCD34D] text-[#115E59] flex items-center justify-center font-bold shadow-md border-[3px] border-white dark:border-slate-200/60 dark:border-slate-700 cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden">
+                        {/* Profile Avatar */}
+                        <Link
+                            to="/dashboard/profile"
+                            className="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md cursor-pointer hover:scale-105 transition-transform duration-300 overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                                color: '#fff',
+                                border: '2px solid var(--border)',
+                            }}
+                        >
                             {user?.avatar ? (
                                 <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                             ) : (

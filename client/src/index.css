@@ -2,44 +2,179 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-premium-bg: #0B1120;
-  --color-premium-sidebar: #111827;
-  --color-premium-card: #1E293B;
-  --color-premium-border: #334155;
-  --color-premium-primary: #F8FAFC;
-  --color-premium-secondary: #94A3B8;
-  --color-premium-accent: #3B82F6;
-  --color-premium-success: #10B981;
-  --color-premium-warning: #F59E0B;
-  --color-premium-ai: #8B5CF6;
-  --color-premium-danger: #EF4444;
+/* ─── Design Token Foundation ──────────────────────────────────────────────── */
+/* All colors are defined here. Components reference these variables only.      */
+/* No raw hex values should appear in component files for structural colors.    */
+
+:root {
+  /* Surfaces */
+  --background: #F8FAFC;
+  --sidebar:    #FFFFFF;
+  --surface:    #FFFFFF;
+  --surface-2:  #F8FAFC;
+  --surface-hover: #F1F5F9;
+
+  /* Borders */
+  --border:     #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Brand */
+  --primary:       #0F766E;
+  --primary-hover: #115E59;
+  --primary-muted: rgba(15, 118, 110, 0.08);
+
+  --secondary:       #2563EB;
+  --secondary-hover: #1D4ED8;
+  --secondary-muted: rgba(37, 99, 235, 0.08);
+
+  /* Semantic */
+  --success:       #16A34A;
+  --success-muted: rgba(22, 163, 74, 0.08);
+  --warning:       #D97706;
+  --warning-muted: rgba(217, 119, 6, 0.08);
+  --danger:        #DC2626;
+  --danger-muted:  rgba(220, 38, 38, 0.08);
+
+  /* Text */
+  --text-primary:   #0F172A;
+  --text-secondary: #64748B;
+  --text-muted:     #94A3B8;
+
+  /* Chart / Accent */
+  --accent-teal:   #14B8A6;
+  --accent-blue:   #3B82F6;
+  --accent-purple: #8B5CF6;
+  --accent-amber:  #F59E0B;
 }
 
-/* Custom base styles removed to allow light/dark mode */
+.dark {
+  /* Surfaces */
+  --background: #0B1220;
+  --sidebar:    #111827;
+  --surface:    #162033;
+  --surface-2:  #111827;
+  --surface-hover: #1E293B;
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Brand */
+  --primary:       #14B8A6;
+  --primary-hover: #0D9488;
+  --primary-muted: rgba(20, 184, 166, 0.12);
+
+  --secondary:       #3B82F6;
+  --secondary-hover: #2563EB;
+  --secondary-muted: rgba(59, 130, 246, 0.12);
+
+  /* Semantic */
+  --success:       #22C55E;
+  --success-muted: rgba(34, 197, 94, 0.12);
+  --warning:       #F59E0B;
+  --warning-muted: rgba(245, 158, 11, 0.12);
+  --danger:        #EF4444;
+  --danger-muted:  rgba(239, 68, 68, 0.12);
+
+  /* Text */
+  --text-primary:   #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted:     #64748B;
+
+  /* Chart / Accent */
+  --accent-teal:   #2DD4BF;
+  --accent-blue:   #60A5FA;
+  --accent-purple: #A78BFA;
+  --accent-amber:  #FBBF24;
+}
+
+/* ─── Base Styles ───────────────────────────────────────────────────────────── */
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-50;
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
   }
 }
 
 * { font-family: 'Inter', sans-serif; }
 
-/* Hide scrollbars globally while keeping scroll functionality */
+/* ─── Utility Classes ───────────────────────────────────────────────────────── */
+
+/* Surfaces */
+.ls-bg         { background-color: var(--background); }
+.ls-sidebar    { background-color: var(--sidebar); }
+.ls-surface    { background-color: var(--surface); }
+.ls-surface-2  { background-color: var(--surface-2); }
+.ls-surface-hover:hover { background-color: var(--surface-hover); }
+
+/* Borders */
+.ls-border     { border-color: var(--border); }
+.ls-border-strong { border-color: var(--border-strong); }
+
+/* Text */
+.ls-text-primary   { color: var(--text-primary); }
+.ls-text-secondary { color: var(--text-secondary); }
+.ls-text-muted     { color: var(--text-muted); }
+
+/* Primary button */
+.ls-btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+  transition: background-color 200ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+.ls-btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* Premium card hover */
+.ls-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+.ls-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+/* Stat card accent: subtle 2px top border + tinted icon bg */
+.ls-stat-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-top-width: 2px;
+}
+
+/* Icon tinted backgrounds */
+.ls-icon-teal   { background-color: var(--primary-muted); color: var(--primary); }
+.ls-icon-blue   { background-color: var(--secondary-muted); color: var(--secondary); }
+.ls-icon-green  { background-color: var(--success-muted); color: var(--success); }
+.ls-icon-amber  { background-color: var(--warning-muted); color: var(--warning); }
+.ls-icon-red    { background-color: var(--danger-muted); color: var(--danger); }
+.ls-icon-purple {
+  background-color: rgba(139, 92, 246, 0.10);
+  color: var(--accent-purple);
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { display: none; }
 * { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ─── Animations ────────────────────────────────────────────────────────────── */
 @keyframes heroReveal { 0%{opacity:0;transform:translateY(28px);filter:blur(12px)} 100%{opacity:1;transform:translateY(0);filter:blur(0)} }
 @keyframes heroFadeUp { 0%{opacity:0;transform:translateY(20px)} 100%{opacity:1;transform:translateY(0)} }
-@keyframes heroZoom { 0%{transform:scale(1.12)} 100%{transform:scale(1)} }
-.hero-anim { opacity:0; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
+@keyframes heroZoom   { 0%{transform:scale(1.12)} 100%{transform:scale(1)} }
+.hero-anim   { opacity:0; animation-fill-mode:forwards; animation-timing-function:cubic-bezier(0.16,1,0.3,1); }
 .hero-reveal { animation-name:heroReveal; animation-duration:1.1s; }
-.hero-fade { animation-name:heroFadeUp; animation-duration:1s; }
-.hero-zoom { animation:heroZoom 1.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+.hero-fade   { animation-name:heroFadeUp; animation-duration:1s; }
+.hero-zoom   { animation:heroZoom 1.8s cubic-bezier(0.16,1,0.3,1) forwards; }
 @media (prefers-reduced-motion: reduce){ .hero-anim,.hero-zoom{ animation:none; opacity:1; } }
 
 @keyframes heartbeat-line {
-  0% { stroke-dashoffset: 200; }
+  0%   { stroke-dashoffset: 200; }
   100% { stroke-dashoffset: 0; }
 }
 .animate-heartbeat {

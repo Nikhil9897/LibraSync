@@ -38,29 +38,44 @@ const MyBorrowsPage = () => {
 
     if (loading) return (
         <div className="flex justify-center items-center h-64">
-            <div className="w-10 h-10 border-4 border-[#0d5959] dark:border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)' }}></div>
         </div>
     );
 
     return (
-        <div className="max-w-5xl mx-auto py-8" style={{  }}>
+        <div className="max-w-5xl mx-auto py-8">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl  font-bold text-[#1a1f36] dark:text-white">My Borrow History</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Manage your active borrows and reading history</p>
+                    <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>My Borrow History</h1>
+                    <p className="font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>Manage your active borrows and reading history</p>
                 </div>
             </div>
 
             {borrows.length === 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-3xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 p-16 text-center shadow-sm">
-                    <div className="w-24 h-24 bg-[#0d5959]/10 dark:bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#0d5959] dark:text-teal-500">
+                <div
+                    className="rounded-3xl p-16 text-center shadow-sm border"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <div
+                        className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{
+                            backgroundColor: 'var(--primary-muted)',
+                            color: 'var(--primary)',
+                        }}
+                    >
                         <FiBookOpen size={40} />
                     </div>
-                    <h2 className="text-2xl  font-bold text-[#1a1f36] dark:text-white mb-3">No Borrows Found</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-lg mb-8 max-w-md mx-auto font-medium">
+                    <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>No Borrows Found</h2>
+                    <p className="text-lg mb-8 max-w-md mx-auto font-medium" style={{ color: 'var(--text-secondary)' }}>
                         You haven't borrowed any books yet. Check out our catalog to find your next great read!
                     </p>
-                    <Link to="/catalog" className="inline-block px-8 py-3 bg-[#0d5959] dark:bg-teal-600 text-white font-bold rounded-xl hover:bg-[#0a4747] dark:hover:bg-teal-700 transition-all shadow-md shadow-[#0d5959]/20 dark:shadow-teal-900/20">
+                    <Link
+                        to="/catalog"
+                        className="inline-block px-8 py-3 text-white font-bold rounded-xl transition-all shadow-md ls-btn-primary"
+                    >
                         Explore Catalog
                     </Link>
                 </div>
@@ -71,54 +86,94 @@ const MyBorrowsPage = () => {
                         const isUrgent = days <= 3 && borrow.status === 'active';
                         
                         return (
-                            <div key={borrow._id} className="bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 p-6 flex flex-col md:flex-row gap-6 shadow-sm hover:shadow-md dark:shadow-none transition-shadow">
-                                <div className="shrink-0 w-24 h-36 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 group">
+                            <div
+                                key={borrow._id}
+                                className="rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-sm border transition-all duration-250"
+                                style={{
+                                    backgroundColor: 'var(--surface)',
+                                    borderColor: 'var(--border)',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                            >
+                                <div
+                                    className="shrink-0 w-24 h-36 rounded-lg overflow-hidden border flex items-center justify-center"
+                                    style={{
+                                        backgroundColor: 'var(--surface-hover)',
+                                        borderColor: 'var(--border)',
+                                    }}
+                                >
                                     {borrow.book?.coverImage ? (
-                                        <img src={borrow.book.coverImage} alt={borrow.book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={borrow.book.coverImage} alt={borrow.book.title} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-700 dark:text-slate-200 dark:text-slate-500 bg-slate-50 dark:bg-slate-900 dark:bg-slate-700 text-xs uppercase font-bold text-center p-2">
+                                        <div className="text-xs uppercase font-bold text-center p-2" style={{ color: 'var(--text-muted)' }}>
                                             No Cover
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex-1 flex flex-col justify-center">
-                                    <h3 className="text-xl font-bold text-[#1a1f36] dark:text-white mb-1">{borrow.book?.title}</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-4">{borrow.book?.author}</p>
+                                    <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{borrow.book?.title}</h3>
+                                    <p className="font-medium text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{borrow.book?.author}</p>
                                     
                                     <div className="flex flex-wrap gap-3 text-sm">
-                                        <span className={`px-3 py-1 rounded-full font-bold shadow-sm ${
-                                            borrow.status === 'active' ? 'bg-[#0d5959]/10 text-[#0d5959] dark:bg-teal-500/10 dark:text-teal-400' : 'bg-green-50 text-green-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                        }`}>
+                                        <span
+                                            className="px-3 py-1 rounded-full font-bold shadow-sm"
+                                            style={{
+                                                backgroundColor: borrow.status === 'active' ? 'var(--primary-muted)' : 'var(--success-muted)',
+                                                color: borrow.status === 'active' ? 'var(--primary)' : 'var(--success)',
+                                            }}
+                                        >
                                             {borrow.status.toUpperCase()}
                                         </span>
-                                        <span className="text-slate-500 dark:text-slate-700 dark:text-slate-200 py-1 font-medium bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50 px-3 rounded-full border dark:border-slate-700 border-slate-100 dark:border-slate-600">
+                                        <span
+                                            className="py-1 font-medium px-3 rounded-full border"
+                                            style={{
+                                                backgroundColor: 'var(--surface-2)',
+                                                borderColor: 'var(--border)',
+                                                color: 'var(--text-secondary)',
+                                            }}
+                                        >
                                             Issued: {new Date(borrow.createdAt).toLocaleDateString()}
                                         </span>
                                     </div>
                                 </div>
                                 
-                                <div className="flex flex-col items-start md:items-end justify-center gap-3 border-t dark:border-slate-700 md:border-t-0 md:border-l border-slate-200/60 dark:border-slate-700 pt-4 md:pt-0 md:pl-6 min-w-[200px]">
+                                <div
+                                    className="flex flex-col items-start md:items-end justify-center gap-3 border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-6 min-w-[200px]"
+                                    style={{ borderColor: 'var(--border)' }}
+                                >
                                     {borrow.status === 'active' ? (
                                         <>
                                             <div className="text-center md:text-right w-full">
-                                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 font-medium">Due Date</p>
-                                                <p className={`font-bold text-lg ${isUrgent ? 'text-red-600 dark:text-red-400' : 'text-[#1a1f36] dark:text-white'}`}>
+                                                <p className="text-sm mb-1 font-medium" style={{ color: 'var(--text-secondary)' }}>Due Date</p>
+                                                <p className="font-bold text-lg" style={{ color: isUrgent ? 'var(--danger)' : 'var(--text-primary)' }}>
                                                     {days > 0 ? `In ${days} Days` : 'Overdue!'}
                                                 </p>
                                             </div>
                                             <button
                                                 onClick={() => handleRenew(borrow._id)}
                                                 disabled={borrow.renewalsCount >= borrow.maxRenewals}
-                                                className="w-full px-5 py-2.5 bg-[#0d5959] dark:bg-teal-600 text-white font-bold rounded-xl hover:bg-[#0a4747] dark:hover:bg-teal-700 disabled:opacity-50 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-500 transition-all shadow-md shadow-[#0d5959]/20 dark:shadow-teal-900/20 disabled:shadow-none"
+                                                className="w-full px-5 py-2.5 text-white font-bold rounded-xl disabled:opacity-50 transition-all shadow-md"
+                                                style={{
+                                                    backgroundColor: 'var(--primary)',
+                                                }}
+                                                onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
                                             >
                                                 Renew ({borrow.renewalsCount}/{borrow.maxRenewals})
                                             </button>
                                         </>
                                     ) : (
-                                        <div className="text-center md:text-right w-full bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50 p-4 rounded-xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700">
-                                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 font-medium">Returned On</p>
-                                            <p className="font-bold text-[#1a1f36] dark:text-white">
+                                        <div
+                                            className="text-center md:text-right w-full p-4 rounded-xl border"
+                                            style={{
+                                                backgroundColor: 'var(--surface-2)',
+                                                borderColor: 'var(--border)',
+                                            }}
+                                        >
+                                            <p className="text-sm mb-1 font-medium" style={{ color: 'var(--text-secondary)' }}>Returned On</p>
+                                            <p className="font-bold" style={{ color: 'var(--text-primary)' }}>
                                                 {new Date(borrow.returnDate).toLocaleDateString()}
                                             </p>
                                         </div>

@@ -2,8 +2,14 @@ const router = require('express').Router();
 const { protect, authorize } = require('../middleware/auth');
 const {
     getAllBooks, getBookById, createBook,
-    updateBook, deleteBook, getRelatedBooks, toggleWishlist
+    updateBook, deleteBook, getRelatedBooks, toggleWishlist, getCategoryCounts, getCategories
 } = require('../controllers/bookController');
+
+router.route('/category-counts')
+    .get(getCategoryCounts);
+
+router.route('/categories/all')
+    .get(getCategories);
 
 router.route('/')
     .get(getAllBooks)

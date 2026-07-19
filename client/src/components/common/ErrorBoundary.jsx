@@ -17,19 +17,33 @@ class ErrorBoundary extends React.Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-gray-50 dark:bg-slate-700 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-slate-800 max-w-lg w-full rounded-2xl shadow-lg border dark:border-slate-700 p-8 text-center">
-                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--background)' }}>
+                    <div
+                        className="max-w-lg w-full rounded-2xl shadow-lg border p-8 text-center"
+                        style={{
+                            backgroundColor: 'var(--surface)',
+                            borderColor: 'var(--border)',
+                        }}
+                    >
+                        <div
+                            className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4"
+                            style={{
+                                backgroundColor: 'var(--danger-muted)',
+                                color: 'var(--danger)',
+                            }}
+                        >
                             ⚠️
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Oops! Something went wrong.</h1>
-                        <p className="text-gray-500 dark:text-slate-400 mb-6">
+                        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                            Oops! Something went wrong.
+                        </h1>
+                        <p className="mb-6 text-sm" style={{ color: 'var(--text-secondary)' }}>
                             We're sorry, but the application encountered an unexpected error. 
-                            Our team has been notified.
+                            Please try reloading the page.
                         </p>
                         <button
                             onClick={() => window.location.reload()}
-                            className="px-6 py-3 bg-[#0d5959] text-white font-medium rounded-xl hover:bg-[#0a4747] transition-colors shadow-sm w-full"
+                            className="px-6 py-3 text-white font-medium rounded-xl transition-all shadow-sm w-full ls-btn-primary"
                         >
                             Reload Application
                         </button>

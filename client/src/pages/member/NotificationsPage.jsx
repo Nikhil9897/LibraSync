@@ -35,44 +35,59 @@ const NotificationsPage = () => {
 
     const getIcon = (type) => {
         switch(type) {
-            case 'due_reminder': return <FiClock size={24} className="text-yellow-500" />;
-            case 'overdue': return <FiAlertTriangle size={24} className="text-red-500" />;
-            case 'reservation': return <FiBookmark size={24} className="text-[#0d5959] dark:text-teal-500" />;
-            case 'fine': return <FiDollarSign size={24} className="text-red-600 dark:text-red-400" />;
-            case 'announcement': return <FiInfo size={24} className="text-[#0d5959]" />;
-            default: return <FiBell size={24} className="text-[#d4a853]" />;
+            case 'due_reminder': return <FiClock size={24} style={{ color: 'var(--warning)' }} />;
+            case 'overdue': return <FiAlertTriangle size={24} style={{ color: 'var(--danger)' }} />;
+            case 'reservation': return <FiBookmark size={24} style={{ color: 'var(--secondary)' }} />;
+            case 'fine': return <FiDollarSign size={24} style={{ color: 'var(--danger)' }} />;
+            case 'announcement': return <FiInfo size={24} style={{ color: 'var(--primary)' }} />;
+            default: return <FiBell size={24} style={{ color: 'var(--primary)' }} />;
         }
     };
 
     if (loading) return (
         <div className="flex justify-center items-center h-64">
-            <div className="w-10 h-10 border-4 border-[#0d5959] dark:border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)' }}></div>
         </div>
     );
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
-        <div className="max-w-4xl mx-auto py-8" style={{  }}>
+        <div className="max-w-4xl mx-auto py-8">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl  font-bold text-[#1a1f36] dark:text-white">Notifications</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Stay updated on your library activity</p>
+                    <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Notifications</h1>
+                    <p className="font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>Stay updated on your library activity</p>
                 </div>
                 {unreadCount > 0 && (
-                    <div className="bg-[#0d5959] dark:bg-teal-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-[#0d5959]/20 dark:shadow-teal-900/20">
+                    <div
+                        className="text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md"
+                        style={{ backgroundColor: 'var(--primary)' }}
+                    >
                         {unreadCount} Unread
                     </div>
                 )}
             </div>
 
             {notifications.length === 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-3xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 p-16 text-center shadow-sm">
-                    <div className="w-24 h-24 bg-[#0d5959]/10 dark:bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#0d5959] dark:text-teal-400">
+                <div
+                    className="rounded-3xl p-16 text-center shadow-sm border"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <div
+                        className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{
+                            backgroundColor: 'var(--primary-muted)',
+                            color: 'var(--primary)',
+                        }}
+                    >
                         <FiBell size={40} />
                     </div>
-                    <h2 className="text-2xl  font-bold text-[#1a1f36] dark:text-white mb-3">All Caught Up!</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-lg mb-8 max-w-md mx-auto font-medium">
+                    <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>All Caught Up!</h2>
+                    <p className="text-lg mb-8 max-w-md mx-auto font-medium" style={{ color: 'var(--text-secondary)' }}>
                         You have no notifications right now. We'll let you know when something needs your attention.
                     </p>
                 </div>
@@ -82,30 +97,59 @@ const NotificationsPage = () => {
                         <div 
                             key={notification._id} 
                             onClick={() => markAsRead(notification._id, notification.isRead)}
-                            className={`bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 cursor-pointer transition-all shadow-sm ${
-                                !notification.isRead ? 'border-[#0d5959]/30 dark:border-teal-500/30 bg-[#0d5959]/5 dark:bg-teal-500/10' : 'border-slate-200/60 dark:border-slate-700 hover:border-[#0d5959]/20 dark:hover:border-teal-500/30 hover:shadow-md dark:shadow-none'
-                            }`}
+                            className="rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 cursor-pointer transition-all shadow-sm border"
+                            style={{
+                                backgroundColor: 'var(--surface)',
+                                borderColor: !notification.isRead ? 'var(--primary)' : 'var(--border)',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = !notification.isRead ? 'var(--primary)' : 'var(--border)'; }}
                         >
-                            <div className={`shrink-0 w-14 h-14 rounded-full flex items-center justify-center ${!notification.isRead ? 'bg-white dark:bg-slate-800 dark:bg-slate-700 shadow-sm border dark:border-slate-700 border-slate-100 dark:border-slate-600' : 'bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50'}`}>
+                            <div
+                                className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border"
+                                style={{
+                                    backgroundColor: !notification.isRead ? 'var(--primary-muted)' : 'var(--surface-hover)',
+                                    borderColor: 'var(--border)',
+                                }}
+                            >
                                 {getIcon(notification.type)}
                             </div>
                             
                             <div className="flex-1">
                                 <div className="flex justify-between items-start mb-1 gap-4">
-                                    <h3 className={`font-bold text-lg ${!notification.isRead ? 'text-[#0d5959] dark:text-teal-400' : 'text-[#1a1f36] dark:text-white'}`}>
+                                    <h3
+                                        className="font-bold text-lg"
+                                        style={{ color: !notification.isRead ? 'var(--primary)' : 'var(--text-primary)' }}
+                                    >
                                         {notification.title}
                                     </h3>
-                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full whitespace-nowrap">
+                                    <span
+                                        className="text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap border"
+                                        style={{
+                                            backgroundColor: 'var(--surface-2)',
+                                            borderColor: 'var(--border)',
+                                            color: 'var(--text-secondary)',
+                                        }}
+                                    >
                                         {new Date(notification.createdAt).toLocaleDateString()}
                                     </span>
                                 </div>
-                                <p className={`text-base ${!notification.isRead ? 'text-[#1a1f36] dark:text-white font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
+                                <p
+                                    className="text-base"
+                                    style={{
+                                        color: !notification.isRead ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                        fontWeight: !notification.isRead ? 600 : 400,
+                                    }}
+                                >
                                     {notification.message}
                                 </p>
                             </div>
 
                             {!notification.isRead && (
-                                <div className="w-3 h-3 bg-[#0d5959] dark:bg-teal-500 rounded-full shadow-[0_0_8px_rgba(13,89,89,0.5)] dark:shadow-[0_0_8px_rgba(20,184,166,0.5)] self-start sm:self-center shrink-0"></div>
+                                <div
+                                    className="w-3 h-3 rounded-full self-start sm:self-center shrink-0 shadow-md"
+                                    style={{ backgroundColor: 'var(--primary)' }}
+                                ></div>
                             )}
                         </div>
                     ))}

@@ -38,41 +38,72 @@ const MyReviewsPage = () => {
 
     if (loading) return (
         <div className="flex justify-center items-center h-64">
-            <div className="w-10 h-10 border-4 border-[#0d5959] dark:border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)' }}></div>
         </div>
     );
 
     return (
-        <div className="max-w-5xl mx-auto py-8" style={{  }}>
+        <div className="max-w-5xl mx-auto py-8">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl  font-bold text-[#1a1f36] dark:text-white">My Reviews</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Manage feedback you've shared about books</p>
+                    <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>My Reviews</h1>
+                    <p className="font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>Manage feedback you've shared about books</p>
                 </div>
             </div>
 
             {reviews.length === 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-3xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 p-16 text-center shadow-sm">
-                    <div className="w-24 h-24 bg-[#0d5959]/10 dark:bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-[#0d5959] dark:text-teal-400">
+                <div
+                    className="rounded-3xl p-16 text-center shadow-sm border"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderColor: 'var(--border)',
+                    }}
+                >
+                    <div
+                        className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
+                        style={{
+                            backgroundColor: 'var(--primary-muted)',
+                            color: 'var(--primary)',
+                        }}
+                    >
                         <FiMessageSquare size={40} />
                     </div>
-                    <h2 className="text-2xl  font-bold text-[#1a1f36] dark:text-white mb-3">No Reviews Yet</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-lg mb-8 max-w-md mx-auto font-medium">
+                    <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>No Reviews Yet</h2>
+                    <p className="text-lg mb-8 max-w-md mx-auto font-medium" style={{ color: 'var(--text-secondary)' }}>
                         You haven't reviewed any books yet. Borrow a book and share your thoughts to help others!
                     </p>
-                    <Link to="/catalog" className="inline-block px-8 py-3 bg-[#0d5959] dark:bg-teal-600 text-white font-bold rounded-xl hover:bg-[#0a4747] dark:hover:bg-teal-700 transition-all shadow-md shadow-[#0d5959]/20 dark:shadow-teal-900/20">
+                    <Link
+                        to="/catalog"
+                        className="inline-block px-8 py-3 text-white font-bold rounded-xl transition-all shadow-md ls-btn-primary"
+                    >
                         Explore Books
                     </Link>
                 </div>
             ) : (
                 <div className="grid gap-6">
                     {reviews.map((review) => (
-                        <div key={review._id} className="bg-white dark:bg-slate-800 rounded-2xl border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 p-6 flex flex-col md:flex-row gap-6 shadow-sm hover:shadow-md dark:shadow-none transition-shadow">
-                            <Link to={`/books/${review.book?._id}`} className="shrink-0 w-32 h-48 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden border dark:border-slate-700 border-slate-200/60 dark:border-slate-700 group">
+                        <div
+                            key={review._id}
+                            className="rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-sm border transition-all duration-250"
+                            style={{
+                                backgroundColor: 'var(--surface)',
+                                borderColor: 'var(--border)',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                        >
+                            <Link
+                                to={`/books/${review.book?._id}`}
+                                className="shrink-0 w-32 h-48 rounded-lg overflow-hidden border group flex items-center justify-center"
+                                style={{
+                                    backgroundColor: 'var(--surface-hover)',
+                                    borderColor: 'var(--border)',
+                                }}
+                            >
                                 {review.book?.coverImage ? (
                                     <img src={review.book.coverImage} alt={review.book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-700 dark:text-slate-200 dark:text-slate-500 bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50">
+                                    <div className="text-xs uppercase font-bold text-center p-2" style={{ color: 'var(--text-muted)' }}>
                                         No Cover
                                     </div>
                                 )}
@@ -81,33 +112,46 @@ const MyReviewsPage = () => {
                             <div className="flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
-                                        <Link to={`/books/${review.book?._id}`} className="text-xl font-bold text-[#1a1f36] dark:text-white hover:text-[#0d5959] dark:hover:text-teal-400 transition-colors line-clamp-1">
+                                        <Link
+                                            to={`/books/${review.book?._id}`}
+                                            className="text-xl font-bold transition-colors line-clamp-1 hover:underline"
+                                            style={{ color: 'var(--text-primary)' }}
+                                        >
                                             {review.book?.title}
                                         </Link>
-                                        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">{review.book?.author}</p>
+                                        <p className="font-medium text-sm" style={{ color: 'var(--text-secondary)' }}>{review.book?.author}</p>
                                     </div>
                                     <button
                                         onClick={() => handleDelete(review._id)}
-                                        className="p-2 text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                                        className="p-2 rounded-lg transition-colors"
+                                        style={{ color: 'var(--text-secondary)' }}
+                                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--danger-muted)'; e.currentTarget.style.color = 'var(--danger)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
                                         title="Delete Review"
                                     >
                                         <FiTrash2 size={18} />
                                     </button>
                                 </div>
 
-                                <div className="flex items-center gap-1 mb-4 text-[#d4a853]">
+                                <div className="flex items-center gap-1 mb-4" style={{ color: 'var(--warning)' }}>
                                     {[...Array(5)].map((_, i) => (
-                                        <FiStar key={i} size={16} className={i < review.rating ? "fill-current" : "text-slate-200 dark:text-slate-600"} />
+                                        <FiStar key={i} size={16} className={i < review.rating ? "fill-current" : "opacity-30"} />
                                     ))}
-                                    <span className="ml-2 text-sm font-bold text-slate-700 dark:text-slate-200">{review.rating}/5</span>
+                                    <span className="ml-2 text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{review.rating}/5</span>
                                 </div>
 
-                                <div className="bg-slate-50 dark:bg-slate-900 dark:bg-slate-700/50 rounded-xl p-4 flex-1 border dark:border-slate-700 border-slate-100 dark:border-slate-600">
-                                    <h4 className="font-bold text-[#1a1f36] dark:text-white mb-1">{review.title}</h4>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed whitespace-pre-line">{review.comment}</p>
+                                <div
+                                    className="rounded-xl p-4 flex-1 border"
+                                    style={{
+                                        backgroundColor: 'var(--surface-2)',
+                                        borderColor: 'var(--border)',
+                                    }}
+                                >
+                                    <h4 className="font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{review.title}</h4>
+                                    <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>{review.comment}</p>
                                 </div>
                                 
-                                <div className="mt-4 flex justify-between items-center text-xs font-medium text-slate-500 dark:text-slate-400">
+                                <div className="mt-4 flex justify-between items-center text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
                                     <span>Posted on {new Date(review.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </div>

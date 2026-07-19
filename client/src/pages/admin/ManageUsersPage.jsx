@@ -39,41 +39,52 @@ const ManageUsersPage = () => {
         try {
             await api.delete(`/users/${userId}`);
             toast.success('Account deactivated');
-            fetchUsers(); // Refresh list to remove deactivated users
+            fetchUsers();
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to deactivate account');
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading users...</div>;
+    if (loading) return <div className="p-8 text-center" style={{ color: 'var(--text-secondary)' }}>Loading users...</div>;
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">Manage Users</h1>
-                    <p className="text-slate-500 dark:text-slate-400">View and manage library member roles.</p>
+                    <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Manage Users</h1>
+                    <p style={{ color: 'var(--text-secondary)' }}>View and manage library member roles.</p>
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
+            <div
+                className="rounded-2xl shadow-sm border overflow-hidden"
+                style={{
+                    backgroundColor: 'var(--surface)',
+                    borderColor: 'var(--border)',
+                }}
+            >
                 <table className="w-full text-left">
-                    <thead className="bg-gray-50 dark:bg-slate-700 border-b dark:border-slate-700">
+                    <thead style={{ backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
                         <tr>
-                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">User Info</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Member Since</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400">Role</th>
-                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-slate-400 text-right">Actions</th>
+                            <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>User Info</th>
+                            <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Member Since</th>
+                            <th className="px-6 py-4 text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Role</th>
+                            <th className="px-6 py-4 text-sm font-semibold text-right" style={{ color: 'var(--text-secondary)' }}>Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y dark:divide-slate-700">
+                    <tbody className="divide-y" style={{ divideColor: 'var(--border)' }}>
                         {users.map((u) => (
-                            <tr key={u._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors">
+                            <tr
+                                key={u._id}
+                                className="transition-colors"
+                                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
+                                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                            >
                                 <td className="px-6 py-4">
-                                    <p className="font-medium text-gray-900 dark:text-white">{u.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400">{u.email}</p>
+                                    <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{u.name}</p>
+                                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{u.email}</p>
                                 </td>
-                                <td className="px-6 py-4 text-sm text-gray-600 dark:text-slate-400">
+                                <td className="px-6 py-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                                     {new Date(u.membershipDate || u._id.getTimestamp?.() || Date.now()).toLocaleDateString()}
                                 </td>
                                 <td className="px-6 py-4">
@@ -82,28 +93,33 @@ const ManageUsersPage = () => {
                                         onChange={(e) => handleRoleChange(u._id, e.target.value)}
                                         disabled={u._id === currentUser?.id}
                                         title={u._id === currentUser?.id ? "You cannot change your own role" : undefined}
-                                        className={`text-sm font-medium px-3 py-1.5 rounded-lg border dark:border-slate-700 outline-none ${
-                                            u._id === currentUser?.id ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                        } ${
-                                            u.role === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                                            u.role === 'librarian' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                            'bg-gray-50 dark:bg-slate-700 text-gray-700 dark:text-slate-300 border-gray-200'
+                                        className={`text-sm font-medium px-3 py-1.5 rounded-lg border outline-none bg-transparent ${
+                                            u._id === currentUser?.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                                         }`}
+                                        style={{
+                                            borderColor: 'var(--border)',
+                                            color: 'var(--text-primary)',
+                                        }}
                                     >
-                                        <option value="member">Member</option>
-                                        <option value="librarian">Librarian</option>
-                                        <option value="admin">Admin</option>
+                                        <option value="member" style={{ backgroundColor: 'var(--surface)' }}>Member</option>
+                                        <option value="librarian" style={{ backgroundColor: 'var(--surface)' }}>Librarian</option>
+                                        <option value="admin" style={{ backgroundColor: 'var(--surface)' }}>Admin</option>
                                     </select>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <button 
                                         onClick={() => handleDeactivate(u._id, u.name)}
                                         disabled={u._id === currentUser?.id}
-                                        className={`font-medium text-sm transition-colors ${
-                                            u._id === currentUser?.id 
-                                                ? 'text-gray-400 cursor-not-allowed' 
-                                                : 'text-red-600 hover:text-red-800'
-                                        }`}
+                                        className="font-medium text-sm transition-colors"
+                                        style={{
+                                            color: u._id === currentUser?.id ? 'var(--text-muted)' : 'var(--danger)',
+                                        }}
+                                        onMouseEnter={e => {
+                                            if (u._id !== currentUser?.id) e.currentTarget.style.color = 'color-mix(in srgb, var(--danger) 70%, #000)';
+                                        }}
+                                        onMouseLeave={e => {
+                                            if (u._id !== currentUser?.id) e.currentTarget.style.color = 'var(--danger)';
+                                        }}
                                     >
                                         Deactivate
                                     </button>

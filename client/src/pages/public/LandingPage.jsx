@@ -33,7 +33,7 @@ const Divider = ({ label = 'or' }) => (
     </div>
 );
 
-const inputCls = "w-full px-4 py-3 border border-slate-200/60 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#0d5959] focus:border-transparent outline-none dark:bg-slate-800 dark:text-white transition-shadow text-sm bg-white";
+const inputCls = "w-full px-4 py-3 border border-slate-200/60 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none dark:bg-slate-800 dark:text-white transition-shadow text-sm bg-white";
 
 // ─── Panel Views ───────────────────────────────────────────────────────────────
 
@@ -84,8 +84,8 @@ const LoginView = ({ onSwitch }) => {
                     <label className="flex items-center gap-2 cursor-pointer group">
                         <div className="relative flex items-center justify-center w-4 h-4">
                             <input type="checkbox" className="peer absolute opacity-0 w-full h-full cursor-pointer z-20" />
-                            <div className="absolute inset-0 rounded border-2 border-gray-300 dark:border-slate-600 group-hover:border-[#0d5959] peer-checked:bg-[#0d5959] peer-checked:border-[#0d5959] transition-all"></div>
-                            <svg className="absolute w-3 h-3 text-white scale-0 peer-checked:scale-100 transition-transform duration-200 z-10 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                            <div className="absolute inset-0 rounded border-2 border-gray-300 dark:border-slate-600 transition-all" style={{ borderColor: 'var(--border)' }}></div>
+                            <svg className="absolute w-3 h-3 text-white scale-0 peer-checked:scale-100 transition-transform duration-200 z-10 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12" />
                             </svg>
                         </div>
@@ -97,7 +97,14 @@ const LoginView = ({ onSwitch }) => {
                 </div>
 
                 <div className="flex gap-4 pt-2">
-                    <button type="submit" disabled={loading} className="flex-1 py-3 bg-[#0d5959] text-white rounded-lg hover:bg-[#0a4747] disabled:opacity-50 font-semibold transition-colors shadow-md shadow-[#0d5959]/20">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="flex-1 py-3 text-white rounded-lg disabled:opacity-50 font-semibold transition-colors shadow-md"
+                        style={{ backgroundColor: 'var(--primary)' }}
+                        onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
+                    >
                         {loading ? 'Signing in…' : 'Login'}
                     </button>
                     <button type="button" onClick={() => onSwitch('register')} className="flex-1 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold transition-colors shadow-sm">
@@ -162,14 +169,21 @@ const RegisterView = ({ onSwitch }) => {
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5">Password</label>
                     <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className={inputCls + " tracking-widest text-lg"} />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-3 bg-[#0d5959] text-white rounded-lg hover:bg-[#0a4747] disabled:opacity-50 font-semibold transition-colors shadow-md shadow-[#0d5959]/20 mt-2">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3 text-white rounded-lg disabled:opacity-50 font-semibold transition-colors shadow-md mt-2"
+                    style={{ backgroundColor: 'var(--primary)' }}
+                    onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
+                >
                     {loading ? 'Creating account…' : 'Create Account'}
                 </button>
             </form>
 
-            <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
+            <p className="text-center text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
                 Already have an account?{' '}
-                <button type="button" onClick={() => onSwitch('login')} className="text-[#0d5959] font-bold hover:text-[#d4a853] transition-colors">
+                <button type="button" onClick={() => onSwitch('login')} className="font-bold transition-colors hover:underline" style={{ color: 'var(--primary)' }}>
                     Sign in
                 </button>
             </p>
@@ -202,11 +216,11 @@ const ForgotView = ({ onSwitch }) => {
                 <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
                     <CheckCircle size={32} className="text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <h2 className="text-xl font-bold text-[#1a1f36] dark:text-white mb-2">Check your inbox</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-xs">
-                    We've sent a password reset link to <span className="font-semibold text-slate-700 dark:text-slate-300">{email}</span>
+                <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Check your inbox</h2>
+                <p className="text-sm mb-6 max-w-xs" style={{ color: 'var(--text-secondary)' }}>
+                    We've sent a password reset link to <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{email}</span>
                 </p>
-                <button type="button" onClick={() => onSwitch('login')} className="text-[#0d5959] font-bold hover:text-[#d4a853] transition-colors text-sm">
+                <button type="button" onClick={() => onSwitch('login')} className="font-bold transition-colors text-sm hover:underline" style={{ color: 'var(--primary)' }}>
                     Back to login
                 </button>
             </div>
@@ -215,20 +229,27 @@ const ForgotView = ({ onSwitch }) => {
 
     return (
         <>
-            <button type="button" onClick={() => onSwitch('login')} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-[#0d5959] dark:hover:text-teal-400 mb-5 text-sm font-medium transition-colors">
+            <button type="button" onClick={() => onSwitch('login')} className="flex items-center gap-2 mb-5 text-sm font-medium transition-colors hover:underline" style={{ color: 'var(--text-secondary)' }}>
                 <ArrowLeft size={15} /> Back to login
             </button>
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-[#1a1f36] dark:text-white">Reset Password</h1>
-                <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm font-medium">Enter your email and we'll send you a reset link.</p>
+                <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Reset Password</h1>
+                <p className="mt-1 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Enter your email and we'll send you a reset link.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5">Email Address</label>
+                    <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email Address</label>
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className={inputCls} />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-3 bg-[#0d5959] text-white rounded-lg hover:bg-[#0a4747] disabled:opacity-50 font-semibold transition-colors shadow-md shadow-[#0d5959]/20">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3 text-white rounded-lg disabled:opacity-50 font-semibold transition-colors shadow-md"
+                    style={{ backgroundColor: 'var(--primary)' }}
+                    onMouseEnter={e => { if(!e.currentTarget.disabled) e.currentTarget.style.backgroundColor = 'var(--primary-hover)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--primary)'; }}
+                >
                     {loading ? 'Sending…' : 'Send Reset Link'}
                 </button>
             </form>

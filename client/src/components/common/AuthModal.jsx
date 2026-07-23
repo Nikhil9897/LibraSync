@@ -49,7 +49,7 @@ const RegisterView = ({ onSwitch, onClose }) => {
             </div>
 
             <button
-                onClick={() => window.location.href = '/api/v1/auth/google'}
+                onClick={() => { const apiBase = import.meta.env.VITE_API_URL || '/api/v1'; window.location.href = `${apiBase}/auth/google`; }}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border rounded-xl transition-colors mb-5 font-medium text-sm"
                 style={{
                     borderColor: 'var(--border)',

@@ -13,7 +13,7 @@ const BG_IMAGE_2 = "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f
 const GoogleButton = ({ label }) => (
     <button
         type="button"
-        onClick={() => window.location.href = '/api/v1/auth/google'}
+        onClick={() => { const apiBase = import.meta.env.VITE_API_URL || '/api/v1'; window.location.href = `${apiBase}/auth/google`; }}
         className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-200/60 dark:border-slate-700 shadow-sm rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors font-medium text-slate-700 dark:text-slate-200 text-sm"
     >
         <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -248,7 +248,6 @@ const DashboardLayout = () => {
                                 <Link
                                     to={item.path}
                                     onClick={() => isMobile && setCollapsed(true)}
-                                    onMouseEnter={handlePreload}
                                     onFocus={handlePreload}
                                     title={collapsed && !isMobile ? item.label : undefined}
                                     className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"

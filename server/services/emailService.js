@@ -2,18 +2,17 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const dns = require('dns');
 
-const isGmail = !process.env.EMAIL_HOST || process.env.EMAIL_HOST.includes('gmail');
+// Belt-and-suspenders IPv4 enforcement — also set at process level in server.js
+// Prevents ENETUNREACH (IPv6 unreachable) on Render, Railway, and other cloud hosts
+dns.setDefaultResultOrder('ipv4first');
 
-// Custom IPv4 lookup override to prevent ENETUNREACH (IPv6 network unreachable) errors on cloud platforms
-const forceIPv4Lookup = (hostname, options, callback) => {
-    return dns.lookup(hostname, { family: 4 }, callback);
-};
+const isGmail = !process.env.EMAIL_HOST || process.env.EMAIL_HOST.includes('gmail');
 
 const transporterConfig = isGmail
     ? {
           host: 'smtp.gmail.com',
           port: 465,
-          secure: true, // Direct SSL connection
+          secure: true,
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS,
@@ -21,7 +20,6 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
-          lookup: forceIPv4Lookup,
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,
@@ -37,7 +35,6 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
-          lookup: forceIPv4Lookup,
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,

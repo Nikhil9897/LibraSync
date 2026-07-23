@@ -1,3 +1,6 @@
+// Force IPv4 for all outbound connections (prevents ENETUNREACH on Render/cloud with no IPv6 support)
+require('dns').setDefaultResultOrder('ipv4first');
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');

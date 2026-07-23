@@ -5,7 +5,9 @@ const isGmail = !process.env.EMAIL_HOST || process.env.EMAIL_HOST.includes('gmai
 
 const transporterConfig = isGmail
     ? {
-          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true, // Direct SSL connection (most reliable on cloud hosts like Render)
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS,
@@ -13,6 +15,7 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
+          family: 4, // Force IPv4 to prevent IPv6 DNS lookup timeouts on cloud servers
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,
@@ -28,6 +31,7 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
+          family: 4,
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,

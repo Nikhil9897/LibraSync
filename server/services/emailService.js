@@ -1,57 +1,64 @@
 require('dotenv').config();
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-// Resend uses HTTPS (port 443) — works on all cloud hosts including Render free tier
-// which blocks outbound SMTP ports (25, 465, 587)
+// Nodemailer Gmail Transport
+// Uses service: 'gmail' with process.env.EMAIL_USER and process.env.EMAIL_PASS (Gmail App Password)
 
-let resendClient = null;
+let transporter = null;
 
-const getClient = () => {
-    if (!resendClient) {
-        if (!process.env.RESEND_API_KEY) {
-            throw new Error('RESEND_API_KEY environment variable is missing!');
+const getTransporter = () => {
+    if (!transporter) {
+        const user = process.env.EMAIL_USER;
+        const pass = process.env.EMAIL_PASS;
+
+        if (!user || !pass) {
+            console.error('❌ EMAIL_USER or EMAIL_PASS environment variable is missing!');
+            throw new Error('Email configuration error: missing credentials');
         }
-        resendClient = new Resend(process.env.RESEND_API_KEY);
+
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false },
+            connectionTimeout: 10000,
+            greetingTimeout: 5000,
+            socketTimeout: 15000,
+        });
     }
-    return resendClient;
+    return transporter;
 };
 
-// Log startup configuration status
-if (!process.env.RESEND_API_KEY) {
-    console.error('❌ Email service: RESEND_API_KEY environment variable is missing. Set it in Render dashboard.');
-} else {
-    console.log('✅ Email transporter is ready to send messages (via Resend HTTPS API)');
-}
-
 const sendEmail = async ({ to, subject, html, text }) => {
-    const client = getClient();
+    const mailTransporter = getTransporter();
 
-    // Auto-generate plain text version from HTML to pass spam filters (multipart/alternative)
+    // Auto-generate plain text version from HTML for spam filter compliance (multipart/alternative)
     const plainText = text || html
         .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
         .replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 
-    // EMAIL_FROM should be a verified Resend sender, e.g. "LibraSync <noreply@yourdomain.com>"
-    // Default to Resend's shared test sender for initial testing
-    const fromAddress = process.env.EMAIL_FROM || 'LibraSync <onboarding@resend.dev>';
+    const fromAddress = process.env.EMAIL_USER
+        ? `"LibraSync" <${process.env.EMAIL_USER}>`
+        : '"LibraSync" <noreply@librasync.com>';
 
-    const { data, error } = await client.emails.send({
+    const mailOptions = {
         from: fromAddress,
         to,
+        replyTo: process.env.EMAIL_USER || to,
         subject,
-        html,
         text: plainText,
-    });
+        html,
+        headers: {
+            'X-Priority': '1',
+            'X-MSMail-Priority': 'High',
+            'Importance': 'high',
+        },
+    };
 
-    if (error) {
-        console.error(`❌ Resend API error sending to ${to}:`, error);
-        throw new Error(error.message || 'Failed to send email via Resend');
-    }
-
-    console.log(`✉️ Email sent successfully to ${to} (Resend ID: ${data.id})`);
-    return data;
+    const info = await mailTransporter.sendMail(mailOptions);
+    console.log(`✉️ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
+    return info;
 };
 
 module.exports = { sendEmail };

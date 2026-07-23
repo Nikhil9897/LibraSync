@@ -1,86 +1,57 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
-const dns = require('dns');
+const { Resend } = require('resend');
 
-// Belt-and-suspenders IPv4 enforcement — also set at process level in server.js
-// Prevents ENETUNREACH (IPv6 unreachable) on Render, Railway, and other cloud hosts
-dns.setDefaultResultOrder('ipv4first');
+// Resend uses HTTPS (port 443) — works on all cloud hosts including Render free tier
+// which blocks outbound SMTP ports (25, 465, 587)
 
-const isGmail = !process.env.EMAIL_HOST || process.env.EMAIL_HOST.includes('gmail');
+let resendClient = null;
 
-const transporterConfig = isGmail
-    ? {
-          host: 'smtp.gmail.com',
-          port: 465,
-          secure: true,
-          auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-          },
-          tls: {
-              rejectUnauthorized: false,
-          },
-          connectionTimeout: 10000,
-          greetingTimeout: 5000,
-          socketTimeout: 15000,
-      }
-    : {
-          host: process.env.EMAIL_HOST,
-          port: Number(process.env.EMAIL_PORT) || 587,
-          secure: Number(process.env.EMAIL_PORT) === 465,
-          auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-          },
-          tls: {
-              rejectUnauthorized: false,
-          },
-          connectionTimeout: 10000,
-          greetingTimeout: 5000,
-          socketTimeout: 15000,
-      };
-
-const transporter = nodemailer.createTransport(transporterConfig);
-
-// Verify transporter config on startup so misconfigurations are caught early
-transporter.verify((error) => {
-    if (error) {
-        console.error('❌ Email transporter verification failed:', error.message);
-        console.error('Please verify EMAIL_USER and EMAIL_PASS (App Password) in your server .env or hosting environment variables.');
-    } else {
-        console.log('✅ Email transporter is ready to send messages');
+const getClient = () => {
+    if (!resendClient) {
+        if (!process.env.RESEND_API_KEY) {
+            throw new Error('RESEND_API_KEY environment variable is missing!');
+        }
+        resendClient = new Resend(process.env.RESEND_API_KEY);
     }
-});
+    return resendClient;
+};
+
+// Log startup configuration status
+if (!process.env.RESEND_API_KEY) {
+    console.error('❌ Email service: RESEND_API_KEY environment variable is missing. Set it in Render dashboard.');
+} else {
+    console.log('✅ Email transporter is ready to send messages (via Resend HTTPS API)');
+}
 
 const sendEmail = async ({ to, subject, html, text }) => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error('❌ Cannot send email: EMAIL_USER or EMAIL_PASS environment variables are missing!');
-        throw new Error('Email configuration error on server');
+    const client = getClient();
+
+    // Auto-generate plain text version from HTML to pass spam filters (multipart/alternative)
+    const plainText = text || html
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    // EMAIL_FROM should be a verified Resend sender, e.g. "LibraSync <noreply@yourdomain.com>"
+    // Default to Resend's shared test sender for initial testing
+    const fromAddress = process.env.EMAIL_FROM || 'LibraSync <onboarding@resend.dev>';
+
+    const { data, error } = await client.emails.send({
+        from: fromAddress,
+        to,
+        subject,
+        html,
+        text: plainText,
+    });
+
+    if (error) {
+        console.error(`❌ Resend API error sending to ${to}:`, error);
+        throw new Error(error.message || 'Failed to send email via Resend');
     }
 
-    // Auto-generate plain text version from HTML to pass email spam filters (multipart/alternative)
-    const plainText = text || html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-                                 .replace(/<[^>]+>/g, ' ')
-                                 .replace(/\s+/g, ' ')
-                                 .trim();
-
-    const mailOptions = {
-        from: `"LibraSync" <${process.env.EMAIL_USER}>`,
-        to,
-        replyTo: process.env.EMAIL_USER,
-        subject,
-        text: plainText,
-        html,
-        headers: {
-            'X-Priority': '1',
-            'X-MSMail-Priority': 'High',
-            'Importance': 'high',
-        },
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✉️ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
-    return info;
+    console.log(`✉️ Email sent successfully to ${to} (Resend ID: ${data.id})`);
+    return data;
 };
 
 module.exports = { sendEmail };

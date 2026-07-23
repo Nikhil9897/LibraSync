@@ -1,13 +1,19 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 
 const isGmail = !process.env.EMAIL_HOST || process.env.EMAIL_HOST.includes('gmail');
+
+// Custom IPv4 lookup override to prevent ENETUNREACH (IPv6 network unreachable) errors on cloud platforms
+const forceIPv4Lookup = (hostname, options, callback) => {
+    return dns.lookup(hostname, { family: 4 }, callback);
+};
 
 const transporterConfig = isGmail
     ? {
           host: 'smtp.gmail.com',
           port: 465,
-          secure: true, // Direct SSL connection (most reliable on cloud hosts like Render)
+          secure: true, // Direct SSL connection
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS,
@@ -15,7 +21,7 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
-          family: 4, // Force IPv4 to prevent IPv6 DNS lookup timeouts on cloud servers
+          lookup: forceIPv4Lookup,
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,
@@ -31,7 +37,7 @@ const transporterConfig = isGmail
           tls: {
               rejectUnauthorized: false,
           },
-          family: 4,
+          lookup: forceIPv4Lookup,
           connectionTimeout: 10000,
           greetingTimeout: 5000,
           socketTimeout: 15000,

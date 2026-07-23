@@ -52,7 +52,16 @@ exports.login = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select('+password');
-    if (!user || !(await user.matchPassword(password))) {
+    if (!user) {
+        throw new ApiError(401, 'Invalid email or password');
+    }
+
+    // Account was created via Google OAuth — no password set
+    if (!user.password) {
+        throw new ApiError(401, 'This account uses Google Sign-In. Please click "Continue with Google" to log in.');
+    }
+
+    if (!(await user.matchPassword(password))) {
         throw new ApiError(401, 'Invalid email or password');
     }
 

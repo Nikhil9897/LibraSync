@@ -32,10 +32,7 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin) || origin.startsWith('http://localhost')) {
-      return callback(null, true);
-    }
-    return callback(null, true); // Fallback allow for production flexibility
+    return callback(null, origin);
   },
   credentials: true
 }));

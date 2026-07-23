@@ -1,9 +1,63 @@
 const User = require('../models/User');
+const Book = require('../models/Book');
+const Borrow = require('../models/Borrow');
+const Reservation = require('../models/Reservation');
+const Fine = require('../models/Fine');
+const Notification = require('../models/Notification');
+const Review = require('../models/Review');
+const ActivityLog = require('../models/ActivityLog');
 const asyncHandler = require('../middleware/asyncHandler');
 const ApiError = require('../utils/apiError');
 const ApiResponse = require('../utils/apiResponse');
 const { clearUserCache } = require('../middleware/auth');
 const { uploadBase64Image } = require('../utils/cloudinary');
+
+/**
+ * Helper function to completely remove all data related to a user across all collections
+ */
+const deleteUserCascade = async (userId) => {
+    // 1. Find active borrows and restore book available copies
+    const activeBorrows = await Borrow.find({ user: userId, status: 'active' });
+    for (const borrow of activeBorrows) {
+        if (borrow.book) {
+            await Book.findByIdAndUpdate(borrow.book, { $inc: { availableCopies: 1 } });
+        }
+    }
+    await Borrow.deleteMany({ user: userId });
+
+    // 2. Delete all reservations by user
+    await Reservation.deleteMany({ user: userId });
+
+    // 3. Delete all fines for user
+    await Fine.deleteMany({ user: userId });
+
+    // 4. Delete all notifications for user
+    await Notification.deleteMany({ user: userId });
+
+    // 5. Delete all reviews written by user and recalculate average ratings for affected books
+    const userReviews = await Review.find({ user: userId });
+    await Review.deleteMany({ user: userId });
+    for (const r of userReviews) {
+        if (r.book) {
+            await Review.calcAverageRating(r.book);
+        }
+    }
+
+    // Remove user's votes from helpfulVotes array on other reviews
+    await Review.updateMany(
+        { helpfulVotes: userId },
+        { $pull: { helpfulVotes: userId } }
+    );
+
+    // 6. Delete all activity logs by user
+    await ActivityLog.deleteMany({ user: userId });
+
+    // 7. Clear user cache
+    clearUserCache(userId);
+
+    // 8. Delete user document itself
+    return await User.findByIdAndDelete(userId);
+};
 
 // @desc    Update user profile
 // @route   PUT /api/v1/users/me
@@ -82,9 +136,9 @@ exports.updatePassword = asyncHandler(async (req, res) => {
 // @route   DELETE /api/v1/users/me
 // @access  Private
 exports.deleteMe = asyncHandler(async (req, res) => {
-    const user = await User.findByIdAndDelete(req.user.id);
+    const user = await deleteUserCascade(req.user.id);
     if (!user) throw new ApiError(404, 'User not found');
-    res.json(new ApiResponse(200, 'Account deleted successfully'));
+    res.json(new ApiResponse(200, 'Account and all associated user data permanently deleted successfully'));
 });
 
 // @desc    Get all users (for admin/librarian)
@@ -117,12 +171,16 @@ exports.updateUserRole = asyncHandler(async (req, res) => {
     res.json(new ApiResponse(200, 'User role updated', { user }));
 });
 
-// @desc    Deactivate user account
+// @desc    Delete user account permanently (admin)
 // @route   DELETE /api/v1/users/:id
 // @access  Private (Admin)
 exports.deactivateUser = asyncHandler(async (req, res) => {
-    const user = await User.findByIdAndUpdate(req.params.id, { isActive: false }, { new: true });
+    if (req.params.id === req.user.id.toString()) {
+        throw new ApiError(403, 'You cannot delete your own account from the admin panel.');
+    }
+
+    const user = await deleteUserCascade(req.params.id);
     if (!user) throw new ApiError(404, 'User not found');
 
-    res.json(new ApiResponse(200, 'User account deactivated'));
+    res.json(new ApiResponse(200, 'User account and all related data deleted successfully'));
 });

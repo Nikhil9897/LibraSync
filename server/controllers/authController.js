@@ -20,16 +20,6 @@ exports.register = asyncHandler(async (req, res) => {
 
     const user = await User.create({ name, email, password });
 
-    try {
-        await sendEmail({
-            to: user.email,
-            subject: 'Welcome to LibraSync! 📚',
-            html: getWelcomeEmailTemplate(user.name),
-        });
-    } catch (err) {
-        console.error('Welcome email failed:', err);
-    }
-
     const accessToken = generateAccessToken(user._id, user.role);
     const refreshToken = generateRefreshToken(user._id);
 
@@ -40,6 +30,13 @@ exports.register = asyncHandler(async (req, res) => {
             refreshToken,
         })
     );
+
+    // Send welcome email in background (non-blocking)
+    sendEmail({
+        to: user.email,
+        subject: 'Welcome to LibraSync! 📚',
+        html: getWelcomeEmailTemplate(user.name),
+    }).catch(err => console.error('Background welcome email failed:', err.message));
 });
 
 // @desc    Login user
@@ -138,8 +135,15 @@ exports.getMe = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/auth/forgot-password
 exports.forgotPassword = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
+
+    // Always return a generic message to prevent email enumeration attacks
     if (!user) {
-        throw new ApiError(404, 'No account with that email');
+        return res.json(new ApiResponse(200, 'If an account with that email exists, a reset link has been sent.'));
+    }
+
+    // Block password reset for OAuth-only accounts (no password set)
+    if (!user.password && user.googleId) {
+        return res.json(new ApiResponse(200, 'If an account with that email exists, a reset link has been sent.'));
     }
 
     const resetToken = user.getResetPasswordToken();
@@ -147,19 +151,20 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    try {
-        await sendEmail({
-            to: user.email,
-            subject: 'LibraSync — Password Reset',
-            html: getResetPasswordEmailTemplate(resetUrl, user.name),
-        });
-        res.json(new ApiResponse(200, 'Reset email sent'));
-    } catch (err) {
+    // Return response immediately so UI never hangs waiting for SMTP TCP handshake
+    res.json(new ApiResponse(200, 'If an account with that email exists, a reset link has been sent.'));
+
+    // Trigger email send in background (non-blocking)
+    sendEmail({
+        to: user.email,
+        subject: 'LibraSync — Password Reset',
+        html: getResetPasswordEmailTemplate(resetUrl, user.name),
+    }).catch(async (err) => {
+        console.error('Background reset email failed:', err.message);
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
-        throw new ApiError(500, 'Email could not be sent');
-    }
+    });
 });
 
 // @desc    Reset password
@@ -182,7 +187,9 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
-    await user.save();
+    // validateBeforeSave: false prevents Mongoose from rejecting the save
+    // due to unrelated required fields that weren't changed
+    await user.save({ validateBeforeSave: false });
 
     res.json(new ApiResponse(200, 'Password reset successful'));
 });

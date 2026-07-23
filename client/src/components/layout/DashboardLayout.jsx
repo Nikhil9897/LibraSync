@@ -8,7 +8,7 @@ import {
     LayoutDashboard, BookOpen, Calendar, DollarSign, Star, 
     Bell, User, Settings, Book, Upload, Download, 
     Users, TrendingUp, LogOut, Menu, Clock, AlertTriangle, Bookmark, Info,
-    Sun, Moon, Monitor, Heart
+    Sun, Moon, Monitor, Heart, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -146,12 +146,13 @@ const DashboardLayout = () => {
             {/* Sidebar */}
             <motion.aside 
                 initial={false}
-                animate={isMobile ? { x: collapsed ? '-100%' : 0, width: 280 } : { width: collapsed ? 80 : 280, x: 0 }}
-                className="md:rounded-r-3xl transition-all duration-300 fixed h-[100vh] md:h-[98vh] top-0 md:top-[1vh] z-[70] flex flex-col shadow-2xl overflow-hidden"
-                style={{ backgroundColor: 'var(--sidebar)' }}
+                animate={isMobile ? { x: collapsed ? '-100%' : 0, width: 300 } : { width: collapsed ? 80 : 280, x: 0 }}
+                className="md:rounded-r-3xl transition-all duration-300 fixed h-[100dvh] md:h-[98vh] top-0 md:top-[1vh] z-[70] flex flex-col shadow-2xl overflow-hidden touch-pan-y"
+                style={{ backgroundColor: 'var(--sidebar)', overscrollBehavior: 'contain' }}
+                onTouchStart={(e) => e.stopPropagation()}
             >
                 {/* Logo Row */}
-                <div className="h-20 flex items-center justify-between px-6" style={{ borderBottom: '1px solid var(--border)' }}>
+                <div className="h-20 flex items-center justify-between px-6 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
                     <AnimatePresence>
                         {(!collapsed || isMobile) && (
                             <motion.div
@@ -161,6 +162,7 @@ const DashboardLayout = () => {
                             >
                                 <Link 
                                     to="/" 
+                                    onClick={() => isMobile && setCollapsed(true)}
                                     className="flex items-center gap-3 hover:opacity-90 transition-opacity"
                                     style={{ color: 'var(--text-primary)' }}
                                 >
@@ -172,175 +174,179 @@ const DashboardLayout = () => {
                     </AnimatePresence>
                     <button
                         onClick={() => setCollapsed(!collapsed)}
-                        className={`p-2 rounded-xl transition-all ml-auto ${isMobile ? 'hidden' : ''}`}
+                        className="p-2 rounded-xl transition-all ml-auto"
                         style={{ color: 'var(--text-secondary)' }}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--surface-hover)'}
                         onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                        aria-label="Toggle navigation menu"
                     >
-                        <Menu size={22} />
+                        {isMobile ? <X size={24} /> : <Menu size={22} />}
                     </button>
                 </div>
 
-                {/* User Profile Card */}
-                <AnimatePresence>
-                    {(!collapsed || isMobile) && (
-                        <motion.div 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="p-6"
-                            style={{ borderBottom: '1px solid var(--border)' }}
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="relative">
-                                    <div
-                                        className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-lg border-2 overflow-hidden shrink-0"
-                                        style={{
-                                            background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-                                            color: '#fff',
-                                            borderColor: 'var(--border)',
-                                        }}
-                                    >
-                                        {user?.avatar ? (
-                                            <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
-                                        ) : (
-                                            user?.name?.charAt(0).toUpperCase() || 'U'
-                                        )}
-                                    </div>
-                                    <div
-                                        className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full"
-                                        style={{ backgroundColor: 'var(--success)', border: '2px solid var(--sidebar)' }}
-                                    />
-                                </div>
-                                <div className="overflow-hidden">
-                                    <p className="text-base font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-                                        {user?.name || 'User'}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span
-                                            className="inline-flex px-2 py-0.5 text-xs font-bold rounded-md capitalize"
+                {/* Single Scrollable Container for Profile, Nav, Portal, and Sign Out */}
+                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1 scrollbar-hide" style={{ overscrollBehavior: 'contain' }}>
+                    {/* User Profile Card */}
+                    <AnimatePresence>
+                        {(!collapsed || isMobile) && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="pb-4 mb-4"
+                                style={{ borderBottom: '1px solid var(--border)' }}
+                            >
+                                <div className="flex items-center gap-4 px-2">
+                                    <div className="relative">
+                                        <div
+                                            className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-lg border-2 overflow-hidden shrink-0"
                                             style={{
-                                                backgroundColor: 'var(--primary-muted)',
-                                                color: 'var(--primary)',
-                                                border: '1px solid var(--border)',
+                                                background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                                                color: '#fff',
+                                                borderColor: 'var(--border)',
                                             }}
                                         >
-                                            {user?.role || 'Member'}
-                                        </span>
+                                            {user?.avatar ? (
+                                                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                            ) : (
+                                                user?.name?.charAt(0).toUpperCase() || 'U'
+                                            )}
+                                        </div>
+                                        <div
+                                            className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full"
+                                            style={{ backgroundColor: 'var(--success)', border: '2px solid var(--sidebar)' }}
+                                        />
+                                    </div>
+                                    <div className="overflow-hidden">
+                                        <p className="text-base font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                                            {user?.name || 'User'}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span
+                                                className="inline-flex px-2 py-0.5 text-xs font-bold rounded-md capitalize"
+                                                style={{
+                                                    backgroundColor: 'var(--primary-muted)',
+                                                    color: 'var(--primary)',
+                                                    border: '1px solid var(--border)',
+                                                }}
+                                            >
+                                                {user?.role || 'Member'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Nav Items */}
+                    <nav className="space-y-1">
+                        {menuItems.map((item) => {
+                            const isActive = location.pathname === item.path || (item.path !== '/dashboard' && item.path !== '/admin' && item.path !== '/librarian/dashboard' && location.pathname.startsWith(item.path));
+                            const handlePreload = () => {
+                                const component = routeComponentMap[item.path];
+                                if (component?.preload) component.preload();
+                            };
+                            return (
+                                <div key={item.path}>
+                                    {item.divider && <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />}
+                                    <Link
+                                        to={item.path}
+                                        onClick={() => isMobile && setCollapsed(true)}
+                                        onFocus={handlePreload}
+                                        title={collapsed && !isMobile ? item.label : undefined}
+                                        className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                        style={{
+                                            backgroundColor: isActive ? 'var(--surface-hover)' : 'transparent',
+                                            color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                                        }}
+                                        onMouseEnter={e => {
+                                            handlePreload();
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                                                e.currentTarget.style.color = 'var(--text-primary)';
+                                            }
+                                        }}
+                                        onMouseLeave={e => {
+                                            if (!isActive) {
+                                                e.currentTarget.style.backgroundColor = 'transparent';
+                                                e.currentTarget.style.color = 'var(--text-secondary)';
+                                            }
+                                        }}
+                                    >
+                                        {isActive && (
+                                            <motion.div 
+                                                layoutId="activeIndicator"
+                                                className="absolute left-0 top-1/4 bottom-1/4 w-1 rounded-r-full"
+                                                style={{ backgroundColor: 'var(--primary)' }}
+                                            />
+                                        )}
+                                        <span className="shrink-0">{item.icon}</span>
+                                        {(!collapsed || isMobile) && (
+                                            <span className="flex-1 truncate">{item.label}</span>
+                                        )}
+                                        {(!collapsed || isMobile) && item.badge && (
+                                            <span
+                                                className="text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto"
+                                                style={{ backgroundColor: 'var(--danger)', color: '#fff' }}
+                                            >
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </div>
+                            );
+                        })}
+
+                        {/* Switch Portal */}
+                        {(user?.role === 'admin' || user?.role === 'librarian') && (
+                            <div className="mt-8">
+                                <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />
+                                {(isAdminMode || isLibrarianMode) ? (
+                                    <Link
+                                        to="/dashboard"
+                                        onClick={() => isMobile && setCollapsed(true)}
+                                        title={collapsed && !isMobile ? 'Member View' : undefined}
+                                        className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                        style={{ color: 'var(--text-secondary)' }}
+                                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                                    >
+                                        <span className="shrink-0"><User size={20} /></span>
+                                        {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to Member View</span>}
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        to={user?.role === 'admin' ? '/admin' : '/librarian/dashboard'}
+                                        onClick={() => isMobile && setCollapsed(true)}
+                                        title={collapsed && !isMobile ? 'Admin View' : undefined}
+                                        className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
+                                        style={{ color: 'var(--text-secondary)' }}
+                                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                                    >
+                                        <span className="shrink-0"><Settings size={20} /></span>
+                                        {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to {user?.role === 'admin' ? 'Admin' : 'Librarian'} View</span>}
+                                    </Link>
+                                )}
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                        )}
+                    </nav>
 
-                {/* Nav Items */}
-                <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-hide">
-                    {menuItems.map((item) => {
-                        const isActive = location.pathname === item.path || (item.path !== '/dashboard' && item.path !== '/admin' && item.path !== '/librarian/dashboard' && location.pathname.startsWith(item.path));
-                        const handlePreload = () => {
-                            const component = routeComponentMap[item.path];
-                            if (component?.preload) component.preload();
-                        };
-                        return (
-                            <div key={item.path}>
-                                {item.divider && <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />}
-                                <Link
-                                    to={item.path}
-                                    onClick={() => isMobile && setCollapsed(true)}
-                                    onFocus={handlePreload}
-                                    title={collapsed && !isMobile ? item.label : undefined}
-                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
-                                    style={{
-                                        backgroundColor: isActive ? 'var(--surface-hover)' : 'transparent',
-                                        color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                                    }}
-                                    onMouseEnter={e => {
-                                        handlePreload();
-                                        if (!isActive) {
-                                            e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-                                            e.currentTarget.style.color = 'var(--text-primary)';
-                                        }
-                                    }}
-                                    onMouseLeave={e => {
-                                        if (!isActive) {
-                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                            e.currentTarget.style.color = 'var(--text-secondary)';
-                                        }
-                                    }}
-                                >
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="activeIndicator"
-                                            className="absolute left-0 top-1/4 bottom-1/4 w-1 rounded-r-full"
-                                            style={{ backgroundColor: 'var(--primary)' }}
-                                        />
-                                    )}
-                                    <span className="shrink-0">{item.icon}</span>
-                                    {(!collapsed || isMobile) && (
-                                        <span className="flex-1 truncate">{item.label}</span>
-                                    )}
-                                    {(!collapsed || isMobile) && item.badge && (
-                                        <span
-                                            className="text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto"
-                                            style={{ backgroundColor: 'var(--danger)', color: '#fff' }}
-                                        >
-                                            {item.badge}
-                                        </span>
-                                    )}
-                                </Link>
-                            </div>
-                        );
-                    })}
-
-                    {/* Switch Portal */}
-                    {(user?.role === 'admin' || user?.role === 'librarian') && (
-                        <div className="mt-8">
-                            <hr className="my-6 mx-2" style={{ borderColor: 'var(--border)' }} />
-                            {(isAdminMode || isLibrarianMode) ? (
-                                <Link
-                                    to="/dashboard"
-                                    onClick={() => isMobile && setCollapsed(true)}
-                                    title={collapsed && !isMobile ? 'Member View' : undefined}
-                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
-                                    style={{ color: 'var(--text-secondary)' }}
-                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                                >
-                                    <span className="shrink-0"><User size={20} /></span>
-                                    {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to Member View</span>}
-                                </Link>
-                            ) : (
-                                <Link
-                                    to={user?.role === 'admin' ? '/admin' : '/librarian/dashboard'}
-                                    onClick={() => isMobile && setCollapsed(true)}
-                                    title={collapsed && !isMobile ? 'Admin View' : undefined}
-                                    className="relative flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-250 group overflow-hidden"
-                                    style={{ color: 'var(--text-secondary)' }}
-                                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--surface-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-                                >
-                                    <span className="shrink-0"><Settings size={20} /></span>
-                                    {(!collapsed || isMobile) && <span className="flex-1 truncate">Switch to {user?.role === 'admin' ? 'Admin' : 'Librarian'} View</span>}
-                                </Link>
-                            )}
-                        </div>
-                    )}
-                </nav>
-
-                {/* Sign Out */}
-                <div className="p-5" style={{ borderTop: '1px solid var(--border)' }}>
-                    <button 
-                        onClick={logout} 
-                        title={collapsed && !isMobile ? 'Sign Out' : undefined}
-                        className={`flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-250 ${(collapsed && !isMobile) ? 'justify-center' : ''}`}
-                        style={{ color: 'var(--danger)' }}
-                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--danger-muted)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                    >
-                        <LogOut size={20} className="shrink-0" />
-                        {(!collapsed || isMobile) && <span className="truncate">Sign Out</span>}
-                    </button>
+                    {/* Sign Out (Inside scrollable container so scrolling on phone is 100% natural & never clips/closes) */}
+                    <div className="pt-6 mt-6 pb-4" style={{ borderTop: '1px solid var(--border)' }}>
+                        <button 
+                            onClick={logout} 
+                            title={collapsed && !isMobile ? 'Sign Out' : undefined}
+                            className={`flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-250 ${(collapsed && !isMobile) ? 'justify-center' : ''}`}
+                            style={{ color: 'var(--danger)' }}
+                            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--danger-muted)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                        >
+                            <LogOut size={20} className="shrink-0" />
+                            {(!collapsed || isMobile) && <span className="truncate">Sign Out</span>}
+                        </button>
+                    </div>
                 </div>
             </motion.aside>
 

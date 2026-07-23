@@ -27,7 +27,7 @@ const seedBooks = async () => {
       publisher: 'HarperCollins',
       publishedDate: new Date('1960-07-11'),
       pageCount: 281,
-      coverImage: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1553383690i/2657.jpg',
+      coverImage: 'https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg',
       category: catMap['Fiction'],
       genres: ['Classic', 'Literary Fiction'],
       language: 'English',

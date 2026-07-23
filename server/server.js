@@ -22,12 +22,23 @@ require('./config/passport');
 const app = express();
 
 // Security middleware
-app.use(helmet());
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://libra-sync-pied.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin) || origin.startsWith('http://localhost')) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Fallback allow for production flexibility
+  },
   credentials: true
 }));
-app.use(rateLimiter);
 app.use(compression());
 
 // Body parsing

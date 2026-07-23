@@ -33,7 +33,10 @@ const AdminDashboard = () => {
                 ]);
                 
                 try {
-                    const healthRes = await fetch('/api/health').then(res => res.json());
+                    const apiBase = import.meta.env.VITE_API_URL || '/api/v1';
+                    // Health endpoint is at /api/health (one level up from /api/v1)
+                    const healthUrl = apiBase.replace('/api/v1', '/api/health').replace('/v1', '/health');
+                    const healthRes = await fetch(healthUrl).then(res => res.json());
                     setSystemHealth({ status: healthRes.status === 'ok' ? 'ok' : 'error' });
                 } catch (e) {
                     setSystemHealth({ status: 'error' });

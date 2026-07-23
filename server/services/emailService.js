@@ -45,17 +45,30 @@ transporter.verify((error) => {
     }
 });
 
-const sendEmail = async ({ to, subject, html }) => {
+const sendEmail = async ({ to, subject, html, text }) => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.error('❌ Cannot send email: EMAIL_USER or EMAIL_PASS environment variables are missing!');
         throw new Error('Email configuration error on server');
     }
 
+    // Auto-generate plain text version from HTML to pass email spam filters (multipart/alternative)
+    const plainText = text || html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                 .replace(/<[^>]+>/g, ' ')
+                                 .replace(/\s+/g, ' ')
+                                 .trim();
+
     const mailOptions = {
         from: `"LibraSync" <${process.env.EMAIL_USER}>`,
         to,
+        replyTo: process.env.EMAIL_USER,
         subject,
+        text: plainText,
         html,
+        headers: {
+            'X-Priority': '1',
+            'X-MSMail-Priority': 'High',
+            'Importance': 'high',
+        },
     };
 
     const info = await transporter.sendMail(mailOptions);

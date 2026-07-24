@@ -1,64 +1,33 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
 
-// Nodemailer Gmail Transport
-// Uses service: 'gmail' with process.env.EMAIL_USER and process.env.EMAIL_PASS (Gmail App Password)
+const GOOGLE_SCRIPT_URL = process.env.GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzWiq0TMh9zEO48eDlv3m_4FOYKudcN2QwAqBJdUv7wdXvngbaaL3kCLwojC5Xarr9ZbA/exec';
 
-let transporter = null;
-
-const getTransporter = () => {
-    if (!transporter) {
-        const user = process.env.EMAIL_USER;
-        const pass = process.env.EMAIL_PASS;
-
-        if (!user || !pass) {
-            console.error('❌ EMAIL_USER or EMAIL_PASS environment variable is missing!');
-            throw new Error('Email configuration error: missing credentials');
-        }
-
-        transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: { user, pass },
-            tls: { rejectUnauthorized: false },
-            connectionTimeout: 10000,
-            greetingTimeout: 5000,
-            socketTimeout: 15000,
+/**
+ * Sends transactional email using Google Apps Script Web App HTTPS relay (Port 443).
+ * Operates over HTTPS — 100% bypasses Render free-tier SMTP blocks and sends to ANY recipient email.
+ */
+const sendEmail = async ({ to, subject, html }) => {
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify({
+                to,
+                subject,
+                html,
+            }),
         });
+
+        const data = await response.json();
+        console.log(`✉️ Email dispatched successfully to ${to} via Google Apps Script (Status: ${data.status})`);
+        return data;
+    } catch (err) {
+        console.error(`❌ Google Apps Script Email Relay Error for ${to}:`, err.message);
+        throw err;
     }
-    return transporter;
-};
-
-const sendEmail = async ({ to, subject, html, text }) => {
-    const mailTransporter = getTransporter();
-
-    // Auto-generate plain text version from HTML for spam filter compliance (multipart/alternative)
-    const plainText = text || html
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    const fromAddress = process.env.EMAIL_USER
-        ? `"LibraSync" <${process.env.EMAIL_USER}>`
-        : '"LibraSync" <noreply@librasync.com>';
-
-    const mailOptions = {
-        from: fromAddress,
-        to,
-        replyTo: process.env.EMAIL_USER || to,
-        subject,
-        text: plainText,
-        html,
-        headers: {
-            'X-Priority': '1',
-            'X-MSMail-Priority': 'High',
-            'Importance': 'high',
-        },
-    };
-
-    const info = await mailTransporter.sendMail(mailOptions);
-    console.log(`✉️ Email sent successfully to ${to} (Message ID: ${info.messageId})`);
-    return info;
 };
 
 module.exports = { sendEmail };
